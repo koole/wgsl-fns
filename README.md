@@ -91,6 +91,23 @@ npm run dev
 
 Documentation is automatically generated from JSDoc comments in the source files. See [FUNCTIONS.md](./FUNCTIONS.md) for the complete auto-generated documentation.
 
+## Release Flow
+
+This project uses automated deployment triggered by GitHub releases:
+
+### Creating a Release
+
+```bash
+# Update version in package.json and create git tag
+npm version 1.0.0
+
+# Push the version commit and tag
+git push origin main --follow-tags
+
+# Publish the package to npm
+npm publish
+```
+
 ## License
 
 MIT

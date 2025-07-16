@@ -1,0 +1,28 @@
+name: Deploy to Vercel on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Trigger Vercel Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Vercel Deploy Hook
+        run: |
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "ref": "${{ github.ref }}",
+              "repository": "${{ github.repository }}",
+              "release_tag": "${{ github.event.release.tag_name }}",
+              "release_name": "${{ github.event.release.name }}",
+              "release_url": "${{ github.event.release.html_url }}"
+            }'
+      
+      - name: Log Deploy Trigger
+        run: |
+          echo "✅ Vercel deploy triggered for release: ${{ github.event.release.tag_name }}"
+          echo "🔗 Release URL: ${{ github.event.release.html_url }}"
