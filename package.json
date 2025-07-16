@@ -1,6 +1,6 @@
 {
   "name": "wgsl-fns",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings",
   "main": "dist/wgsl-fns.cjs.js",
   "module": "dist/wgsl-fns.esm.js",
