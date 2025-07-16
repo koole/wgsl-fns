@@ -6,7 +6,9 @@
   "module": "dist/wgsl-fns.esm.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "wgsl-functions.json",
+    "types"
   ],
   "scripts": {
     "build": "rollup -c",

@@ -1,0 +1,388 @@
+{
+  "meta": {
+    "generatedAt": "2025-07-16T23:40:37.727Z",
+    "totalFunctions": 16,
+    "totalCategories": 4
+  },
+  "categories": [
+    {
+      "name": "Math & Utility",
+      "slug": "math---utility",
+      "description": "Mathematical functions and general utilities for shader calculations.",
+      "functions": [
+        {
+          "name": "elasticWave",
+          "description": "an elastic wave with exponential decay and sinusoidal oscillation.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position along the wave."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude multiplier."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "decay",
+              "type": "f32",
+              "description": "Exponential decay factor."
+            },
+            {
+              "name": "phase",
+              "type": "f32",
+              "description": "Phase offset for the wave."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn elasticWave(x: f32, amplitude: f32, frequency: f32, decay: f32, phase: f32) -> f32 {\n  let d = max(0.001, decay);\n  let decayTerm = exp(-d * x);\n  let oscTerm = sin(frequency * x * 6.28318 + phase);\n  return amplitude * decayTerm * oscTerm;\n}"
+        },
+        {
+          "name": "smoothStep",
+          "description": "interpolation between two values with smooth acceleration and deceleration.",
+          "params": [
+            {
+              "name": "edge0",
+              "type": "f32",
+              "description": "Lower edge of interpolation range."
+            },
+            {
+              "name": "edge1",
+              "type": "f32",
+              "description": "Upper edge of interpolation range."
+            },
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input value to interpolate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "interpolated value between 0 and 1."
+          },
+          "wgslCode": "fn smoothStep(edge0: f32, edge1: f32, x: f32) -> f32 {\n  let t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);\n  return t * t * (3.0 - 2.0 * t);\n}"
+        },
+        {
+          "name": "rotate2D",
+          "description": "a 2D vector by a given angle.",
+          "params": [
+            {
+              "name": "v",
+              "type": "vec2<f32>",
+              "description": "Input 2D vector to rotate."
+            },
+            {
+              "name": "angle",
+              "type": "f32",
+              "description": "Rotation angle in radians."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "2D vector."
+          },
+          "wgslCode": "fn rotate2D(v: vec2<f32>, angle: f32) -> vec2<f32> {\n  let c = cos(angle);\n  let s = sin(angle);\n  return vec2(v.x * c - v.y * s, v.x * s + v.y * c);\n}"
+        }
+      ]
+    },
+    {
+      "name": "Noise & Procedural",
+      "slug": "noise---procedural",
+      "description": "Noise generation and procedural pattern functions for textures and effects.",
+      "functions": [
+        {
+          "name": "hash22",
+          "description": "a 2D hash from a 2D input vector for procedural generation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<f32>",
+              "description": "Input 2D vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "result as 2D vector."
+          },
+          "wgslCode": "fn hash22(p: vec2<f32>) -> vec2<f32> {\n  var p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));\n  p3 += dot(p3, p3.yzx + 33.33);\n  return fract((p3.xx + p3.yz) * p3.zy);\n}"
+        },
+        {
+          "name": "noise2D",
+          "description": "2D Perlin-style noise for procedural textures and patterns.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<f32>",
+              "description": "Input 2D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value typically in range [-1, 1]."
+          },
+          "wgslCode": "fn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),\n        dot(hash22(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),\n        dot(hash22(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);\n}"
+        },
+        {
+          "name": "fbm",
+          "description": "Brownian Motion - combines multiple octaves of noise for complex patterns.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<f32>",
+              "description": "Input 2D coordinate."
+            },
+            {
+              "name": "octaves",
+              "type": "i32",
+              "description": "Number of noise octaves to combine."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "noise value."
+          },
+          "wgslCode": "fn fbm(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
+        }
+      ]
+    },
+    {
+      "name": "Signed Distance Fields",
+      "slug": "signed-distance-fields",
+      "description": "SDF functions for procedural geometry and ray marching techniques.",
+      "functions": [
+        {
+          "name": "sdfCircle",
+          "description": "distance function for a circle.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<f32>",
+              "description": "Point to evaluate distance from."
+            },
+            {
+              "name": "r",
+              "type": "f32",
+              "description": "Circle radius."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "distance to circle surface (negative inside, positive outside)."
+          },
+          "wgslCode": "fn sdfCircle(p: vec2<f32>, r: f32) -> f32 {\n  return length(p) - r;\n}"
+        },
+        {
+          "name": "sdfBox",
+          "description": "distance function for a rectangular box.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<f32>",
+              "description": "Point to evaluate distance from."
+            },
+            {
+              "name": "b",
+              "type": "vec2<f32>",
+              "description": "Box half-dimensions (width/2, height/2)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "distance to box surface (negative inside, positive outside)."
+          },
+          "wgslCode": "fn sdfBox(p: vec2<f32>, b: vec2<f32>) -> f32 {\n  let d = abs(p) - b;\n  return length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0);\n}"
+        },
+        {
+          "name": "sdfUnion",
+          "description": "two SDFs using union operation (closest surface).",
+          "params": [
+            {
+              "name": "d1",
+              "type": "f32",
+              "description": "Distance from first shape."
+            },
+            {
+              "name": "d2",
+              "type": "f32",
+              "description": "Distance from second shape."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "distance representing union of both shapes."
+          },
+          "wgslCode": "fn sdfUnion(d1: f32, d2: f32) -> f32 {\n  return min(d1, d2);\n}"
+        },
+        {
+          "name": "sdfIntersection",
+          "description": "two SDFs using intersection operation (overlapping area only).",
+          "params": [
+            {
+              "name": "d1",
+              "type": "f32",
+              "description": "Distance from first shape."
+            },
+            {
+              "name": "d2",
+              "type": "f32",
+              "description": "Distance from second shape."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "distance representing intersection of both shapes."
+          },
+          "wgslCode": "fn sdfIntersection(d1: f32, d2: f32) -> f32 {\n  return max(d1, d2);\n}"
+        },
+        {
+          "name": "sdfSubtraction",
+          "description": "two SDFs using subtraction operation (first shape minus second).",
+          "params": [
+            {
+              "name": "d1",
+              "type": "f32",
+              "description": "Distance from shape to subtract from."
+            },
+            {
+              "name": "d2",
+              "type": "f32",
+              "description": "Distance from shape to subtract."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "distance representing first shape with second subtracted."
+          },
+          "wgslCode": "fn sdfSubtraction(d1: f32, d2: f32) -> f32 {\n  return max(-d1, d2);\n}"
+        }
+      ]
+    },
+    {
+      "name": "Color & Graphics",
+      "slug": "color---graphics",
+      "description": "Color space conversion and palette generation functions.",
+      "functions": [
+        {
+          "name": "palette",
+          "description": "colors using cosine-based palette function for smooth color gradients.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (typically 0-1) for palette lookup."
+            },
+            {
+              "name": "a",
+              "type": "vec3<f32>",
+              "description": "Offset values for RGB channels."
+            },
+            {
+              "name": "b",
+              "type": "vec3<f32>",
+              "description": "Amplitude values for RGB channels."
+            },
+            {
+              "name": "c",
+              "type": "vec3<f32>",
+              "description": "Frequency values for RGB channels."
+            },
+            {
+              "name": "d",
+              "type": "vec3<f32>",
+              "description": "Phase values for RGB channels."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "RGB color."
+          },
+          "wgslCode": "fn palette(t: f32, a: vec3<f32>, b: vec3<f32>, c: vec3<f32>, d: vec3<f32>) -> vec3<f32> {\n  return a + b * cos(6.28318 * (c * t + d));\n}"
+        },
+        {
+          "name": "linearToSrgb",
+          "description": "linear RGB color values to sRGB color space.",
+          "params": [
+            {
+              "name": "color",
+              "type": "vec3<f32>",
+              "description": "Linear RGB color values."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "color values."
+          },
+          "wgslCode": "fn linearToSrgb(color: vec3<f32>) -> vec3<f32> {\n  return pow(color, vec3(1.0 / 2.2));\n}"
+        },
+        {
+          "name": "srgbToLinear",
+          "description": "sRGB color values to linear RGB color space.",
+          "params": [
+            {
+              "name": "color",
+              "type": "vec3<f32>",
+              "description": "sRGB color values."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "RGB color values."
+          },
+          "wgslCode": "fn srgbToLinear(color: vec3<f32>) -> vec3<f32> {\n  return pow(color, vec3(2.2));\n}"
+        },
+        {
+          "name": "hue2rgb",
+          "description": "function for HSL to RGB conversion - converts hue component to RGB.",
+          "params": [
+            {
+              "name": "p",
+              "type": "f32",
+              "description": "First HSL conversion parameter."
+            },
+            {
+              "name": "q",
+              "type": "f32",
+              "description": "Second HSL conversion parameter."
+            },
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Hue value (adjusted)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "component value."
+          },
+          "wgslCode": "fn hue2rgb(p: f32, q: f32, t: f32) -> f32 {\n  var t_adj = t;\n  if (t_adj < 0.0) { t_adj += 1.0; }\n  if (t_adj > 1.0) { t_adj -= 1.0; }\n  if (t_adj < 1.0 / 6.0) { return p + (q - p) * 6.0 * t_adj; }\n  if (t_adj < 1.0 / 2.0) { return q; }\n  if (t_adj < 2.0 / 3.0) { return p + (q - p) * (2.0 / 3.0 - t_adj) * 6.0; }\n  return p;\n}"
+        },
+        {
+          "name": "hslToRgb",
+          "description": "HSL (Hue, Saturation, Lightness) color to RGB.",
+          "params": [
+            {
+              "name": "hsl",
+              "type": "vec3<f32>",
+              "description": "HSL color values (hue: 0-1, saturation: 0-1, lightness: 0-1)."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "color values."
+          },
+          "wgslCode": "fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hue2rgb(p, q, h + 1.0 / 3.0),\n    hue2rgb(p, q, h),\n    hue2rgb(p, q, h - 1.0 / 3.0)\n  );\n}"
+        }
+      ]
+    }
+  ]
+}

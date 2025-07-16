@@ -11,7 +11,7 @@ const ts = require('typescript');
  */
 
 const srcDir = path.join(__dirname, '../src');
-const outputFile = path.join(__dirname, '../FUNCTIONS.md');
+const outputFile = path.join(__dirname, '../docs/wgsl-functions.json');
 
 // Categories and their corresponding files
 const categories = {
@@ -96,19 +96,20 @@ function parseFile(filePath) {
   return functions;
 }
 
-function generateMarkdown() {
-  let markdown = '# WGSL Functions Documentation\n\n';
-  markdown += 'Auto-generated documentation for all WGSL functions in this package.\n\n';
-  markdown += '## Table of Contents\n\n';
+function generateJson() {
+  const documentation = {
+    meta: {
+      generatedAt: new Date().toISOString(),
+      totalFunctions: 0,
+      totalCategories: Object.keys(categories).length
+    },
+    categories: []
+  };
   
-  // Generate table of contents
-  Object.keys(categories).forEach(category => {
-    markdown += `- [${category}](#${category.toLowerCase().replace(/[^a-z0-9]/g, '-')})\n`;
-  });
-  markdown += '\n';
+  let totalFunctions = 0;
   
   // Generate documentation for each category
-  Object.entries(categories).forEach(([category, filename]) => {
+  Object.entries(categories).forEach(([categoryName, filename]) => {
     const filePath = path.join(srcDir, filename);
     
     if (!fs.existsSync(filePath)) {
@@ -123,57 +124,40 @@ function generateMarkdown() {
       return;
     }
     
-    markdown += `## ${category}\n\n`;
+    totalFunctions += functions.length;
     
-    functions.forEach(func => {
-      markdown += `### \`${func.name}\`\n\n`;
-      markdown += `${func.description}\n\n`;
-      
-      if (func.params.length > 0) {
-        markdown += '**Parameters:**\n\n';
-        func.params.forEach(param => {
-          markdown += `- \`${param.name}\` (\`${param.type}\`) - ${param.description}\n`;
-        });
-        markdown += '\n';
-      }
-      
-      if (func.returns) {
-        markdown += `**Returns:** \`${func.returns.type}\` - ${func.returns.description}\n\n`;
-      }
-      
-      if (func.wgslCode) {
-        markdown += '**WGSL Code:**\n\n';
-        markdown += '```wgsl\n';
-        markdown += func.wgslCode;
-        markdown += '\n```\n\n';
-      }
-      
-      markdown += '---\n\n';
+    documentation.categories.push({
+      name: categoryName,
+      slug: categoryName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      description: getCategoryDescription(categoryName),
+      functions: functions
     });
   });
   
-  return markdown;
+  documentation.meta.totalFunctions = totalFunctions;
+  
+  return documentation;
+}
+
+function getCategoryDescription(categoryName) {
+  const descriptions = {
+    'Math & Utility': 'Mathematical functions and general utilities for shader calculations.',
+    'Noise & Procedural': 'Noise generation and procedural pattern functions for textures and effects.',
+    'Signed Distance Fields': 'SDF functions for procedural geometry and ray marching techniques.',
+    'Color & Graphics': 'Color space conversion and palette generation functions.'
+  };
+  return descriptions[categoryName] || '';
 }
 
 function main() {
   try {
     console.log('🔍 Scanning WGSL functions...');
-    const documentation = generateMarkdown();
+    const documentation = generateJson();
     
-    fs.writeFileSync(outputFile, documentation);
+    fs.writeFileSync(outputFile, JSON.stringify(documentation, null, 2));
     console.log(`✅ Documentation generated: ${outputFile}`);
-    
-    // Count total functions
-    const totalFunctions = Object.values(categories).reduce((total, filename) => {
-      const filePath = path.join(srcDir, filename);
-      if (fs.existsSync(filePath)) {
-        const functions = parseFile(filePath);
-        return total + functions.length;
-      }
-      return total;
-    }, 0);
-    
-    console.log(`📊 Total functions documented: ${totalFunctions}`);
+    console.log(`📊 Total functions documented: ${documentation.meta.totalFunctions}`);
+    console.log(`� Total categories: ${documentation.meta.totalCategories}`);
     
   } catch (error) {
     console.error('❌ Error generating documentation:', error);
@@ -185,4 +169,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { parseFile, generateMarkdown };
+module.exports = { parseFile, generateJson };
