@@ -3,10 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('comment-parser');
+const ts = require('typescript');
 
 /**
  * Documentation generator for WGSL functions
- * Parses JSDoc-style comments with custom @wgsl tags
+ * Parses JSDoc-style comments with custom @wgsl tags and extracts WGSL code from exports
  */
 
 const srcDir = path.join(__dirname, '../src');
@@ -24,6 +25,41 @@ function parseFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const comments = parse(content);
   
+  // Parse TypeScript AST to extract exported constants
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    content,
+    ts.ScriptTarget.Latest,
+    true
+  );
+  
+  const exports = {};
+  
+  // Walk the AST to find exported constants
+  function visit(node) {
+    if (ts.isVariableStatement(node) && 
+        node.modifiers && 
+        node.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword)) {
+      
+      node.declarationList.declarations.forEach(declaration => {
+        if (ts.isIdentifier(declaration.name) && 
+            declaration.initializer && 
+            ts.isTemplateExpression(declaration.initializer) || 
+            ts.isNoSubstitutionTemplateLiteral(declaration.initializer)) {
+          
+          const name = declaration.name.text;
+          const value = declaration.initializer.text || 
+                       (declaration.initializer.head ? declaration.initializer.head.text : '');
+          exports[name] = value;
+        }
+      });
+    }
+    
+    ts.forEachChild(node, visit);
+  }
+  
+  visit(sourceFile);
+  
   const functions = [];
   
   comments.forEach(comment => {
@@ -37,8 +73,11 @@ function parseFile(filePath) {
     const returnTag = comment.tags.find(tag => tag.tag === 'returns');
     
     if (nameTag) {
+      const functionName = nameTag.name;
+      const wgslCode = exports[functionName] || '';
+      
       functions.push({
-        name: nameTag.name,
+        name: functionName,
         description: descTag ? descTag.description : '',
         params: paramTags.map(param => ({
           name: param.name,
@@ -48,7 +87,8 @@ function parseFile(filePath) {
         returns: returnTag ? {
           type: returnTag.type,
           description: returnTag.description
-        } : null
+        } : null,
+        wgslCode: wgslCode
       });
     }
   });
@@ -99,6 +139,13 @@ function generateMarkdown() {
       
       if (func.returns) {
         markdown += `**Returns:** \`${func.returns.type}\` - ${func.returns.description}\n\n`;
+      }
+      
+      if (func.wgslCode) {
+        markdown += '**WGSL Code:**\n\n';
+        markdown += '```wgsl\n';
+        markdown += func.wgslCode;
+        markdown += '\n```\n\n';
       }
       
       markdown += '---\n\n';
