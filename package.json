@@ -1,0 +1,36 @@
+{
+  "name": "wgsl-fns",
+  "version": "1.0.0",
+  "description": "A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings",
+  "main": "dist/wgsl-fns.cjs.js",
+  "module": "dist/wgsl-fns.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wgsl",
+    "webgpu",
+    "shaders",
+    "glsl",
+    "graphics",
+    "gpu"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "rollup": "^2.79.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
+  }
+}
