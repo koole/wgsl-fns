@@ -1,6 +1,10 @@
 # wgsl-fns
 
-A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings for building WebGPU shaders.
+A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings for building WebGPU shaders. Includes mathematical utilities (`elasticWave`, `smoothStep`), noise generation (`noise2D`, `fbm`), signed distance fields (`sdfCircle`, `sdfBox`), and color manipulation functions (`palette`, `hslToRgb`).
+
+## Available Functions
+
+For a complete list of all available functions with detailed documentation, parameters, and examples, see **[FUNCTIONS.md](./FUNCTIONS.md)**.
 
 ## Installation
 
@@ -37,32 +41,6 @@ import wgslFns from 'wgsl-fns';
 console.log(wgslFns.elasticWave);
 console.log(Object.keys(wgslFns)); // List all available functions
 ```
-
-## Available Functions
-
-### Math & Utility
-- `elasticWave` - Elastic wave function with decay
-- `smoothStep` - Smooth step interpolation
-- `rotate2D` - 2D rotation transformation
-
-### Noise & Procedural
-- `noise2D` - 2D Perlin-style noise
-- `hash22` - 2D to 2D hash function
-- `fbm` - Fractional Brownian Motion
-
-### Signed Distance Functions (SDF)
-- `sdfCircle` - Circle SDF
-- `sdfBox` - Box SDF
-- `sdfUnion` - Union of two SDFs
-- `sdfIntersection` - Intersection of two SDFs
-- `sdfSubtraction` - Subtraction of two SDFs
-
-### Color & Graphics
-- `palette` - Color palette generation
-- `linearToSrgb` - Linear to sRGB conversion
-- `srgbToLinear` - sRGB to linear conversion
-- `hue2rgb` - HSL to RGB helper
-- `hslToRgb` - HSL to RGB conversion
 
 ## API Reference
 
@@ -101,12 +79,17 @@ ${getFns(['elasticWave', 'smoothStep'])}
 ## Development
 
 ```bash
+# Generate documentation
+npm run docs
+
 # Build the package
 npm run build
 
 # Watch for changes during development
 npm run dev
 ```
+
+Documentation is automatically generated from JSDoc comments in the source files. See [FUNCTIONS.md](./FUNCTIONS.md) for the complete auto-generated documentation.
 
 ## License
 
