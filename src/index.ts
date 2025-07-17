@@ -17,8 +17,11 @@ export function getFns(functionNames: WgslFunctionName[]): string {
   return functions.join('\n\n');
 }
 
-// Export individual functions
+// Export individual functions and types
 export * from './functions';
+
+// Explicit export of commonly used types for better discoverability
+export type { WgslFunctionName } from './functions';
 
 // Default export of all functions object
 export default wgslFns;
