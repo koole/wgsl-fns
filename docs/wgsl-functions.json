@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T11:38:32.435Z",
-    "totalFunctions": 83,
+    "generatedAt": "2025-07-17T12:05:01.354Z",
+    "totalFunctions": 87,
     "totalCategories": 10
   },
   "categories": [
@@ -158,7 +158,7 @@
             "type": "vec2<f32>",
             "description": "value and derivative."
           },
-          "wgslCode": "fn logisticCurve(x: f32, midpoint: f32, steepness: f32, min: f32, max: f32) -> vec2<f32> {\n  // Scale factor for steepness\n  let k = max(0.001, steepness);\n  \n  // Shift x relative to midpoint\n  let z = -k * (x - midpoint);\n  \n  // Calculate the exponent\n  let expTerm = exp(z);\n  \n  // Calculate the logistic function value\n  let logistic = 1.0 / (1.0 + expTerm);\n  \n  // Scale to min-max range\n  let range = max - min;\n  let value = min + range * logistic;\n  \n  // Calculate the derivative\n  let derivative = range * k * expTerm / ((1.0 + expTerm) * (1.0 + expTerm));\n  \n  return vec2<f32>(value, derivative);\n}"
+          "wgslCode": "fn logisticCurve(x: f32, midpoint: f32, steepness: f32, minValue: f32, maxValue: f32) -> vec2<f32> {\n  // Scale factor for steepness\n  let k = max(0.001, steepness);\n  \n  // Shift x relative to midpoint\n  let z = -k * (x - midpoint);\n  \n  // Calculate the exponent\n  let expTerm = exp(z);\n  \n  // Calculate the logistic function value\n  let logistic = 1.0 / (1.0 + expTerm);\n  \n  // Scale to min-max range\n  let range = maxValue - minValue;\n  let value = minValue + range * logistic;\n  \n  // Calculate the derivative\n  let derivative = range * k * expTerm / ((1.0 + expTerm) * (1.0 + expTerm));\n  \n  return vec2<f32>(value, derivative);\n}"
         },
         {
           "name": "stepSequence",
@@ -217,7 +217,7 @@
             "type": "vec2<f32>",
             "description": "result as 2D vector."
           },
-          "wgslCode": "fn hash22(p: vec2<f32>) -> vec2<f32> {\n  var p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));\n  p3 += dot(p3, p3.yzx + 33.33);\n  return fract((p3.xx + p3.yz) * p3.zy);\n}"
+          "wgslCode": "fn hash22(p: vec2<f32>) -> vec2<f32> {\n  var p3 = fract(vec3<f32>(p.xyx) * vec3<f32>(0.1031, 0.1030, 0.0973));\n  p3 += dot(p3, p3.yzx + 33.33);\n  return fract((p3.xx + p3.yz) * p3.zy);\n}"
         },
         {
           "name": "noise2D",
@@ -233,7 +233,7 @@
             "type": "f32",
             "description": "value typically in range [-1, 1]."
           },
-          "wgslCode": "fn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),\n        dot(hash22(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),\n        dot(hash22(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);\n}"
+          "wgslCode": "fn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2<f32>(0.0, 0.0)), f - vec2<f32>(0.0, 0.0)),\n        dot(hash22(i + vec2<f32>(1.0, 0.0)), f - vec2<f32>(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2<f32>(0.0, 1.0)), f - vec2<f32>(0.0, 1.0)),\n        dot(hash22(i + vec2<f32>(1.0, 1.0)), f - vec2<f32>(1.0, 1.0)), u.x), u.y);\n}"
         },
         {
           "name": "fbm",
@@ -271,6 +271,75 @@
             "description": "value between 0 and 1."
           },
           "wgslCode": "fn hash1D(p: f32) -> f32 {\n  // Convert to integer and apply bit manipulation\n  let x = bitcast<u32>(p + 123.456789);\n  var h = x;\n  \n  // Wang hash function\n  h = (h ^ 61u) ^ (h >> 16u);\n  h = h + (h << 3u);\n  h = h ^ (h >> 4u);\n  h = h * 0x27d4eb2du;\n  h = h ^ (h >> 15u);\n  \n  // Convert back to float and normalize\n  return f32(h) / 4294967296.0;\n}"
+        },
+        {
+          "name": "hash31",
+          "description": "a 1D hash value from a 3D input vector.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<f32>",
+              "description": "Input 3D vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "wgslCode": "fn hash31(p: vec3<f32>) -> f32 {\n  var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n  p3 += dot(p3, p3.yxz + 33.33);\n  return fract((p3.x + p3.y) * p3.z);\n}"
+        },
+        {
+          "name": "hash3D",
+          "description": "a 3D hash vector from a 3D input for displacement effects.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<f32>",
+              "description": "Input 3D vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "result as 3D vector with values between -1 and 1."
+          },
+          "wgslCode": "fn hash3D(p: vec3<f32>) -> vec3<f32> {\n  var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n  p3 += dot(p3, p3.yxz + 33.33);\n  return fract((p3.xxy + p3.yxx) * p3.zyx) * 2.0 - 1.0;\n}"
+        },
+        {
+          "name": "noise3D",
+          "description": "3D noise using trilinear interpolation.",
+          "params": [
+            {
+              "name": "x",
+              "type": "vec3<f32>",
+              "description": "Input 3D position for noise generation."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "wgslCode": "fn noise3D(x: vec3<f32>) -> f32 {\n  let p = floor(x);\n  let f = fract(x);\n  \n  return mix(\n    mix(\n      mix(hash31(p), \n          hash31(p + vec3<f32>(1.0, 0.0, 0.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 0.0)), \n          f.x),\n      f.y),\n    mix(\n      mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 0.0, 1.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 1.0)), \n          f.x),\n      f.y),\n    f.z);\n}"
+        },
+        {
+          "name": "warpNoise3D",
+          "description": "3D warping noise using fractal Brownian motion.",
+          "params": [
+            {
+              "name": "x",
+              "type": "vec3<f32>",
+              "description": "Input 3D position."
+            },
+            {
+              "name": "seedVal",
+              "type": "f32",
+              "description": "Random seed for variation."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "warp vector with values between -1 and 1."
+          },
+          "wgslCode": "fn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n  var p = x + seedVal;\n  var nx = 0.0;\n  var ny = 0.0;\n  var nz = 0.0;\n  var w = 0.5;\n  \n  for (var i = 0; i < 3; i++) {\n    nx += w * noise3D(p);\n    ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n    nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n    p *= 2.0;\n    w *= 0.5;\n  }\n  \n  return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n}"
         }
       ]
     },
@@ -642,7 +711,7 @@
             "type": "f32",
             "description": "distance to the Julia set surface."
           },
-          "wgslCode": "fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {\n  var z = vec4<f32>(position, 0.0);\n  var dz = vec4<f32>(1.0, 0.0, 0.0, 0.0);\n  var m = dot(z, z);\n  var i = 0;\n  \n  // Quaternion multiplication helper\n  let quatMul = fn(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {\n    return vec4<f32>(\n      a.x * b.x - a.y * b.y - a.z * b.z - a.w * b.w,\n      a.x * b.y + a.y * b.x + a.z * b.w - a.w * b.z,\n      a.x * b.z - a.y * b.w + a.z * b.x + a.w * b.y,\n      a.x * b.w + a.y * b.z - a.z * b.y + a.w * b.x\n    );\n  };\n  \n  // Julia set iteration\n  for (i = 0; i < i32(iterations) && m < bailout * bailout; i += 1) {\n    dz = 2.0 * quatMul(z, dz);\n    z = quatMul(z, z) + c;\n    m = dot(z, z);\n  }\n  \n  // Compute the distance\n  let dist = 0.5 * log(m) * sqrt(m) / length(dz);\n  return dist;\n}"
+          "wgslCode": "fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {\n  var z = vec4<f32>(position, 0.0);\n  var dz = vec4<f32>(1.0, 0.0, 0.0, 0.0);\n  var m = dot(z, z);\n  var i = 0;\n  \n  // Julia set iteration\n  for (i = 0; i < i32(iterations) && m < bailout * bailout; i += 1) {\n    // Quaternion multiplication for dz = 2.0 * z * dz\n    dz = 2.0 * vec4<f32>(\n      z.x * dz.x - z.y * dz.y - z.z * dz.z - z.w * dz.w,\n      z.x * dz.y + z.y * dz.x + z.z * dz.w - z.w * dz.z,\n      z.x * dz.z - z.y * dz.w + z.z * dz.x + z.w * dz.y,\n      z.x * dz.w + z.y * dz.z - z.z * dz.y + z.w * dz.x\n    );\n    \n    // Quaternion multiplication for z = z * z + c\n    z = vec4<f32>(\n      z.x * z.x - z.y * z.y - z.z * z.z - z.w * z.w,\n      z.x * z.y + z.y * z.x + z.z * z.w - z.w * z.z,\n      z.x * z.z - z.y * z.w + z.z * z.x + z.w * z.y,\n      z.x * z.w + z.y * z.z - z.z * z.y + z.w * z.x\n    ) + c;\n    \n    m = dot(z, z);\n  }\n  \n  // Compute the distance\n  let dist = 0.5 * log(m) * sqrt(m) / length(dz);\n  return dist;\n}"
         },
         {
           "name": "octahedronSDF",
@@ -2010,7 +2079,7 @@
             "type": "vec3<f32>",
             "description": "position."
           },
-          "wgslCode": "fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {\n  // Simple noise function for displacement\n  let hash3D = fn(p: vec3<f32>) -> vec3<f32> {\n    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n    p3 += dot(p3, p3.yxz + 33.33);\n    return fract((p3.xxy + p3.yxx) * p3.zyx) * 2.0 - 1.0;\n  };\n  \n  let noisePos = position * frequency + seed;\n  let displacement = hash3D(noisePos) * amount;\n  \n  return position + displacement;\n}"
+          "wgslCode": "fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {\n  let noisePos = position * frequency + seed;\n  let displacement = hash3D(noisePos) * amount;\n  \n  return position + displacement;\n}"
         },
         {
           "name": "sdfDomainRepeat",
@@ -2046,7 +2115,7 @@
             "type": "vec3<f32>",
             "description": "repeated position."
           },
-          "wgslCode": "fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {\n  // Simple 3D hash function for warping\n  let hash31 = fn(p: vec3<f32>) -> f32 {\n    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n    p3 += dot(p3, p3.yxz + 33.33);\n    return fract((p3.x + p3.y) * p3.z);\n  };\n  \n  // Simplex-like 3D noise function for warping\n  let noise3D = fn(x: vec3<f32>) -> f32 {\n    let p = floor(x);\n    let f = fract(x);\n    \n    return mix(\n      mix(\n        mix(hash31(p), \n            hash31(p + vec3<f32>(1.0, 0.0, 0.0)), \n            f.x),\n        mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), \n            hash31(p + vec3<f32>(1.0, 1.0, 0.0)), \n            f.x),\n        f.y),\n      mix(\n        mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), \n            hash31(p + vec3<f32>(1.0, 0.0, 1.0)), \n            f.x),\n        mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), \n            hash31(p + vec3<f32>(1.0, 1.0, 1.0)), \n            f.x),\n        f.y),\n      f.z);\n  };\n  \n  // FBM (Fractal Brownian Motion) noise for domain warping\n  let warpNoise = fn(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n    let p = x + seedVal;\n    var nx = 0.0;\n    var ny = 0.0;\n    var nz = 0.0;\n    var w = 0.5;\n    \n    for (var i = 0; i < 3; i++) {\n      nx += w * noise3D(p);\n      ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n      nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n      p *= 2.0;\n      w *= 0.5;\n    }\n    \n    return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n  };\n  \n  // Calculate warping for position\n  let warp = warpNoise(position * warpScale, seed) * warpAmount;\n  \n  // Apply warping to position\n  let warpedPos = position + warp;\n  \n  // Calculate repetition\n  return warpedPos - cellSize * round(warpedPos / cellSize);\n}"
+          "wgslCode": "fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {\n  // Calculate warping for position\n  let warp = warpNoise3D(position * warpScale, seed) * warpAmount;\n  \n  // Apply warping to position\n  let warpedPos = position + warp;\n  \n  // Calculate repetition\n  return warpedPos - cellSize * round(warpedPos / cellSize);\n}"
         },
         {
           "name": "sdfFiniteRepeat",

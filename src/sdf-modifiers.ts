@@ -128,13 +128,6 @@ export const sdfTaper = `fn sdfTaper(position: vec3<f32>, amount: f32, axis: vec
  * @returns {vec3<f32>} Displaced position.
  */
 export const sdfDisplace = `fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {
-  // Simple noise function for displacement
-  let hash3D = fn(p: vec3<f32>) -> vec3<f32> {
-    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
-    p3 += dot(p3, p3.yxz + 33.33);
-    return fract((p3.xxy + p3.yxx) * p3.zyx) * 2.0 - 1.0;
-  };
-  
   let noisePos = position * frequency + seed;
   let displacement = hash3D(noisePos) * amount;
   
@@ -153,59 +146,8 @@ export const sdfDisplace = `fn sdfDisplace(position: vec3<f32>, amount: f32, fre
  * @returns {vec3<f32>} Domain repeated position.
  */
 export const sdfDomainRepeat = `fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {
-  // Simple 3D hash function for warping
-  let hash31 = fn(p: vec3<f32>) -> f32 {
-    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
-    p3 += dot(p3, p3.yxz + 33.33);
-    return fract((p3.x + p3.y) * p3.z);
-  };
-  
-  // Simplex-like 3D noise function for warping
-  let noise3D = fn(x: vec3<f32>) -> f32 {
-    let p = floor(x);
-    let f = fract(x);
-    
-    return mix(
-      mix(
-        mix(hash31(p), 
-            hash31(p + vec3<f32>(1.0, 0.0, 0.0)), 
-            f.x),
-        mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), 
-            hash31(p + vec3<f32>(1.0, 1.0, 0.0)), 
-            f.x),
-        f.y),
-      mix(
-        mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), 
-            hash31(p + vec3<f32>(1.0, 0.0, 1.0)), 
-            f.x),
-        mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), 
-            hash31(p + vec3<f32>(1.0, 1.0, 1.0)), 
-            f.x),
-        f.y),
-      f.z);
-  };
-  
-  // FBM (Fractal Brownian Motion) noise for domain warping
-  let warpNoise = fn(x: vec3<f32>, seedVal: f32) -> vec3<f32> {
-    let p = x + seedVal;
-    var nx = 0.0;
-    var ny = 0.0;
-    var nz = 0.0;
-    var w = 0.5;
-    
-    for (var i = 0; i < 3; i++) {
-      nx += w * noise3D(p);
-      ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));
-      nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));
-      p *= 2.0;
-      w *= 0.5;
-    }
-    
-    return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;
-  };
-  
   // Calculate warping for position
-  let warp = warpNoise(position * warpScale, seed) * warpAmount;
+  let warp = warpNoise3D(position * warpScale, seed) * warpAmount;
   
   // Apply warping to position
   let warpedPos = position + warp;

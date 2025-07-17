@@ -14,7 +14,7 @@ export * from './sdf-utils';
 
 // Import individual functions for registry
 import { elasticWave, smoothStep, rotate2D, exponentialRamp, logisticCurve, stepSequence } from './math';
-import { hash22, noise2D, fbm, hash1D } from './noise';
+import { hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D } from './noise';
 import { sdfCircle, sdfBox, sdfUnion, sdfIntersection, sdfSubtraction, boxFrameSDF, cappedTorusSDF, capsuleSDF, coneSDF, cylinderSDF, ellipsoidSDF, gyroidSDF, hexagonalPrismSDF, icosahedronSDF, juliaSDF, octahedronSDF, planeSDF, pyramidSDF, rhombusSDF, roundBoxSDF, roundedConeSDF, roundedCylinderSDF, sphereSDF, tetrahedronSDF, torusSDF, triangularPrismSDF } from './sdf';
 import { palette, linearToSrgb, srgbToLinear, hue2rgb, hslToRgb } from './color';
 import { bezierCubic, easeIn, easeOut, easeInOut, elasticIn, elasticOut, backIn, backOut, springPhysics } from './animation';
@@ -39,6 +39,10 @@ export const wgslFns = {
   hash22,
   fbm,
   hash1D,
+  hash31,
+  hash3D,
+  noise3D,
+  warpNoise3D,
   
   // SDF functions
   sdfCircle,

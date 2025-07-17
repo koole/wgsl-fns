@@ -80,7 +80,7 @@ export const exponentialRamp = `fn exponentialRamp(x: f32, base: f32, scale: f32
  * @param {f32} max Maximum output value.
  * @returns {vec2<f32>} Function value and derivative.
  */
-export const logisticCurve = `fn logisticCurve(x: f32, midpoint: f32, steepness: f32, min: f32, max: f32) -> vec2<f32> {
+export const logisticCurve = `fn logisticCurve(x: f32, midpoint: f32, steepness: f32, minValue: f32, maxValue: f32) -> vec2<f32> {
   // Scale factor for steepness
   let k = max(0.001, steepness);
   
@@ -94,8 +94,8 @@ export const logisticCurve = `fn logisticCurve(x: f32, midpoint: f32, steepness:
   let logistic = 1.0 / (1.0 + expTerm);
   
   // Scale to min-max range
-  let range = max - min;
-  let value = min + range * logistic;
+  let range = maxValue - minValue;
+  let value = minValue + range * logistic;
   
   // Calculate the derivative
   let derivative = range * k * expTerm / ((1.0 + expTerm) * (1.0 + expTerm));

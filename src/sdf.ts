@@ -248,20 +248,24 @@ export const juliaSDF = `fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iteratio
   var m = dot(z, z);
   var i = 0;
   
-  // Quaternion multiplication helper
-  let quatMul = fn(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {
-    return vec4<f32>(
-      a.x * b.x - a.y * b.y - a.z * b.z - a.w * b.w,
-      a.x * b.y + a.y * b.x + a.z * b.w - a.w * b.z,
-      a.x * b.z - a.y * b.w + a.z * b.x + a.w * b.y,
-      a.x * b.w + a.y * b.z - a.z * b.y + a.w * b.x
-    );
-  };
-  
   // Julia set iteration
   for (i = 0; i < i32(iterations) && m < bailout * bailout; i += 1) {
-    dz = 2.0 * quatMul(z, dz);
-    z = quatMul(z, z) + c;
+    // Quaternion multiplication for dz = 2.0 * z * dz
+    dz = 2.0 * vec4<f32>(
+      z.x * dz.x - z.y * dz.y - z.z * dz.z - z.w * dz.w,
+      z.x * dz.y + z.y * dz.x + z.z * dz.w - z.w * dz.z,
+      z.x * dz.z - z.y * dz.w + z.z * dz.x + z.w * dz.y,
+      z.x * dz.w + z.y * dz.z - z.z * dz.y + z.w * dz.x
+    );
+    
+    // Quaternion multiplication for z = z * z + c
+    z = vec4<f32>(
+      z.x * z.x - z.y * z.y - z.z * z.z - z.w * z.w,
+      z.x * z.y + z.y * z.x + z.z * z.w - z.w * z.z,
+      z.x * z.z - z.y * z.w + z.z * z.x + z.w * z.y,
+      z.x * z.w + z.y * z.z - z.z * z.y + z.w * z.x
+    ) + c;
+    
     m = dot(z, z);
   }
   

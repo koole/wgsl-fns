@@ -8,7 +8,7 @@
  * @returns {vec2<f32>} Hash result as 2D vector.
  */
 export const hash22 = `fn hash22(p: vec2<f32>) -> vec2<f32> {
-  var p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
+  var p3 = fract(vec3<f32>(p.xyx) * vec3<f32>(0.1031, 0.1030, 0.0973));
   p3 += dot(p3, p3.yzx + 33.33);
   return fract((p3.xx + p3.yz) * p3.zy);
 }`;
@@ -25,10 +25,10 @@ export const noise2D = `fn noise2D(p: vec2<f32>) -> f32 {
   let f = fract(p);
   let u = f * f * (3.0 - 2.0 * f);
   return mix(
-    mix(dot(hash22(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
-        dot(hash22(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
-    mix(dot(hash22(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
-        dot(hash22(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
+    mix(dot(hash22(i + vec2<f32>(0.0, 0.0)), f - vec2<f32>(0.0, 0.0)),
+        dot(hash22(i + vec2<f32>(1.0, 0.0)), f - vec2<f32>(1.0, 0.0)), u.x),
+    mix(dot(hash22(i + vec2<f32>(0.0, 1.0)), f - vec2<f32>(0.0, 1.0)),
+        dot(hash22(i + vec2<f32>(1.0, 1.0)), f - vec2<f32>(1.0, 1.0)), u.x), u.y);
 }`;
 
 /**
@@ -72,4 +72,87 @@ export const hash1D = `fn hash1D(p: f32) -> f32 {
   
   // Convert back to float and normalize
   return f32(h) / 4294967296.0;
+}`;
+
+/**
+ * @wgsl
+ * @name hash31
+ * @description Generates a 1D hash value from a 3D input vector.
+ * @param {vec3<f32>} p Input 3D vector to hash.
+ * @returns {f32} Hashed value between 0 and 1.
+ */
+export const hash31 = `fn hash31(p: vec3<f32>) -> f32 {
+  var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
+  p3 += dot(p3, p3.yxz + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}`;
+
+/**
+ * @wgsl
+ * @name hash3D
+ * @description Generates a 3D hash vector from a 3D input for displacement effects.
+ * @param {vec3<f32>} p Input 3D vector to hash.
+ * @returns {vec3<f32>} Hash result as 3D vector with values between -1 and 1.
+ */
+export const hash3D = `fn hash3D(p: vec3<f32>) -> vec3<f32> {
+  var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));
+  p3 += dot(p3, p3.yxz + 33.33);
+  return fract((p3.xxy + p3.yxx) * p3.zyx) * 2.0 - 1.0;
+}`;
+
+/**
+ * @wgsl
+ * @name noise3D
+ * @description Generates 3D noise using trilinear interpolation.
+ * @param {vec3<f32>} x Input 3D position for noise generation.
+ * @returns {f32} Noise value between 0 and 1.
+ */
+export const noise3D = `fn noise3D(x: vec3<f32>) -> f32 {
+  let p = floor(x);
+  let f = fract(x);
+  
+  return mix(
+    mix(
+      mix(hash31(p), 
+          hash31(p + vec3<f32>(1.0, 0.0, 0.0)), 
+          f.x),
+      mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), 
+          hash31(p + vec3<f32>(1.0, 1.0, 0.0)), 
+          f.x),
+      f.y),
+    mix(
+      mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), 
+          hash31(p + vec3<f32>(1.0, 0.0, 1.0)), 
+          f.x),
+      mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), 
+          hash31(p + vec3<f32>(1.0, 1.0, 1.0)), 
+          f.x),
+      f.y),
+    f.z);
+}`;
+
+/**
+ * @wgsl
+ * @name warpNoise3D
+ * @description Generates 3D warping noise using fractal Brownian motion.
+ * @param {vec3<f32>} x Input 3D position.
+ * @param {f32} seedVal Random seed for variation.
+ * @returns {vec3<f32>} 3D warp vector with values between -1 and 1.
+ */
+export const warpNoise3D = `fn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {
+  var p = x + seedVal;
+  var nx = 0.0;
+  var ny = 0.0;
+  var nz = 0.0;
+  var w = 0.5;
+  
+  for (var i = 0; i < 3; i++) {
+    nx += w * noise3D(p);
+    ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));
+    nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));
+    p *= 2.0;
+    w *= 0.5;
+  }
+  
+  return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;
 }`;
