@@ -18,7 +18,13 @@ const categories = {
   'Math & Utility': 'math.ts',
   'Noise & Procedural': 'noise.ts', 
   'Signed Distance Fields': 'sdf.ts',
-  'Color & Graphics': 'color.ts'
+  'Color & Graphics': 'color.ts',
+  'Animation & Easing': 'animation.ts',
+  'Wave Functions': 'waves.ts',
+  'SDF Operations': 'sdf-operations.ts',
+  'SDF Transforms': 'sdf-transforms.ts',
+  'SDF Modifiers': 'sdf-modifiers.ts',
+  'SDF Utilities': 'sdf-utils.ts'
 };
 
 function parseFile(filePath) {

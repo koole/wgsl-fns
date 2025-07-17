@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T11:24:14.855Z",
-    "totalFunctions": 41,
-    "totalCategories": 4
+    "generatedAt": "2025-07-17T11:38:32.435Z",
+    "totalFunctions": 83,
+    "totalCategories": 10
   },
   "categories": [
     {
@@ -1041,6 +1041,1170 @@
             "description": "color values."
           },
           "wgslCode": "fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hue2rgb(p, q, h + 1.0 / 3.0),\n    hue2rgb(p, q, h),\n    hue2rgb(p, q, h - 1.0 / 3.0)\n  );\n}"
+        }
+      ]
+    },
+    {
+      "name": "Animation & Easing",
+      "slug": "animation---easing",
+      "description": "",
+      "functions": [
+        {
+          "name": "bezierCubic",
+          "description": "a cubic Bezier curve and returns both value and derivative.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Parameter along the curve (0-1)."
+            },
+            {
+              "name": "p0",
+              "type": "f32",
+              "description": "First control point."
+            },
+            {
+              "name": "p1",
+              "type": "f32",
+              "description": "Second control point."
+            },
+            {
+              "name": "p2",
+              "type": "f32",
+              "description": "Third control point."
+            },
+            {
+              "name": "p3",
+              "type": "f32",
+              "description": "Fourth control point."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "value and derivative (tangent)."
+          },
+          "wgslCode": "fn bezierCubic(t: f32, p0: f32, p1: f32, p2: f32, p3: f32) -> vec2<f32> {\n  // Clamp t to [0,1]\n  let tt = clamp(t, 0.0, 1.0);\n  \n  // Calculate curve value using cubic Bezier formula\n  // P(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃\n  let t1 = 1.0 - tt;\n  let t1Squared = t1 * t1;\n  let t1Cubed = t1Squared * t1;\n  let tSquared = tt * tt;\n  let tCubed = tSquared * tt;\n  \n  let value = t1Cubed * p0 + \n             3.0 * t1Squared * tt * p1 + \n             3.0 * t1 * tSquared * p2 + \n             tCubed * p3;\n  \n  // Calculate derivative for tangent information\n  // P'(t) = 3(1-t)²(P₁-P₀) + 6(1-t)t(P₂-P₁) + 3t²(P₃-P₂)\n  let derivative = 3.0 * t1Squared * (p1 - p0) +\n                  6.0 * t1 * tt * (p2 - p1) +\n                  3.0 * tSquared * (p3 - p2);\n  \n  return vec2<f32>(value, derivative);\n}"
+        },
+        {
+          "name": "easeIn",
+          "description": "ease-in function for smooth acceleration.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            },
+            {
+              "name": "power",
+              "type": "f32",
+              "description": "Easing power (higher = more pronounced curve)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value."
+          },
+          "wgslCode": "fn easeIn(t: f32, power: f32) -> f32 {\n  return pow(clamp(t, 0.0, 1.0), power);\n}"
+        },
+        {
+          "name": "easeOut",
+          "description": "ease-out function for smooth deceleration.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            },
+            {
+              "name": "power",
+              "type": "f32",
+              "description": "Easing power (higher = more pronounced curve)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value."
+          },
+          "wgslCode": "fn easeOut(t: f32, power: f32) -> f32 {\n  return 1.0 - pow(1.0 - clamp(t, 0.0, 1.0), power);\n}"
+        },
+        {
+          "name": "easeInOut",
+          "description": "ease-in-out function for smooth acceleration and deceleration.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            },
+            {
+              "name": "power",
+              "type": "f32",
+              "description": "Easing power (higher = more pronounced curve)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value."
+          },
+          "wgslCode": "fn easeInOut(t: f32, power: f32) -> f32 {\n  let tt = clamp(t, 0.0, 1.0);\n  if (tt < 0.5) {\n    return 0.5 * pow(2.0 * tt, power);\n  } else {\n    return 0.5 + 0.5 * (1.0 - pow(2.0 * (1.0 - tt), power));\n  }\n}"
+        },
+        {
+          "name": "elasticIn",
+          "description": "ease-in function with oscillating motion.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value with elastic effect."
+          },
+          "wgslCode": "fn elasticIn(t: f32) -> f32 {\n  let tt = clamp(t, 0.0, 1.0);\n  return sin(13.0 * 3.14159 * tt) * pow(2.0, 10.0 * (tt - 1.0));\n}"
+        },
+        {
+          "name": "elasticOut",
+          "description": "ease-out function with oscillating motion.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value with elastic effect."
+          },
+          "wgslCode": "fn elasticOut(t: f32) -> f32 {\n  let tt = clamp(t, 0.0, 1.0);\n  return sin(-13.0 * 3.14159 * (tt + 1.0)) * pow(2.0, -10.0 * tt) + 1.0;\n}"
+        },
+        {
+          "name": "backIn",
+          "description": "ease-in function that overshoots before settling.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value with back effect."
+          },
+          "wgslCode": "fn backIn(t: f32) -> f32 {\n  let s = 1.70158;\n  let tt = clamp(t, 0.0, 1.0);\n  return tt * tt * ((s + 1.0) * tt - s);\n}"
+        },
+        {
+          "name": "backOut",
+          "description": "ease-out function that overshoots before settling.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Input parameter (0-1)."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value with back effect."
+          },
+          "wgslCode": "fn backOut(t: f32) -> f32 {\n  let s = 1.70158;\n  let tt = clamp(t, 0.0, 1.0);\n  let tMinus = tt - 1.0;\n  return tMinus * tMinus * ((s + 1.0) * tMinus + s) + 1.0;\n}"
+        },
+        {
+          "name": "springPhysics",
+          "description": "spring animation with configurable parameters.",
+          "params": [
+            {
+              "name": "t",
+              "type": "f32",
+              "description": "Time parameter."
+            },
+            {
+              "name": "targetPosition",
+              "type": "f32",
+              "description": "Target position for the spring."
+            },
+            {
+              "name": "initialPos",
+              "type": "f32",
+              "description": "Initial position."
+            },
+            {
+              "name": "initialVel",
+              "type": "f32",
+              "description": "Initial velocity."
+            },
+            {
+              "name": "stiffness",
+              "type": "f32",
+              "description": "Spring stiffness coefficient."
+            },
+            {
+              "name": "damping",
+              "type": "f32",
+              "description": "Damping coefficient."
+            },
+            {
+              "name": "mass",
+              "type": "f32",
+              "description": "Mass of the spring system."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "and velocity at time t."
+          },
+          "wgslCode": "fn springPhysics(t: f32, targetPosition: f32, initialPos: f32, initialVel: f32, stiffness: f32, damping: f32, mass: f32) -> vec2<f32> {\n  // Ensure positive values for stiffness, damping, and mass\n  let k = max(0.0001, stiffness);\n  let d = max(0.0, damping);\n  let m = max(0.0001, mass);\n  \n  // Calculate the angular frequency and damping ratio\n  let omega = sqrt(k / m);\n  let zeta = d / (2.0 * sqrt(k * m));\n  \n  // Initial displacement from targetPosition position\n  let x0 = initialPos - targetPosition;\n  let v0 = initialVel;\n  \n  var position: f32 = 0.0;\n  var velocity: f32 = 0.0;\n  \n  if (zeta < 1.0) {\n    // Underdamped case\n    let omega_d = omega * sqrt(1.0 - zeta * zeta);\n    let A = x0;\n    let B = (v0 + zeta * omega * x0) / omega_d;\n    \n    // Calculate exponential decay term\n    let expTerm = exp(-zeta * omega * t);\n    \n    // Calculate position and velocity\n    position = targetPosition + expTerm * (A * cos(omega_d * t) + B * sin(omega_d * t));\n    velocity = expTerm * (\n                -zeta * omega * A * cos(omega_d * t) - omega_d * A * sin(omega_d * t) +\n                -zeta * omega * B * sin(omega_d * t) + omega_d * B * cos(omega_d * t)\n               );\n  } else if (zeta == 1.0) {\n    // Critically damped case\n    let A = x0;\n    let B = v0 + omega * x0;\n    \n    // Calculate exponential decay term\n    let expTerm = exp(-omega * t);\n    \n    // Calculate position and velocity\n    position = targetPosition + expTerm * (A + B * t);\n    velocity = expTerm * (B - omega * (A + B * t));\n  } else {\n    // Overdamped case\n    let omega1 = -omega * (zeta + sqrt(zeta * zeta - 1.0));\n    let omega2 = -omega * (zeta - sqrt(zeta * zeta - 1.0));\n    \n    let A = (v0 - omega2 * x0) / (omega1 - omega2);\n    let B = x0 - A;\n    \n    // Calculate position and velocity\n    position = targetPosition + A * exp(omega1 * t) + B * exp(omega2 * t);\n    velocity = A * omega1 * exp(omega1 * t) + B * omega2 * exp(omega2 * t);\n  }\n  \n  return vec2<f32>(position, velocity);\n}"
+        }
+      ]
+    },
+    {
+      "name": "Wave Functions",
+      "slug": "wave-functions",
+      "description": "",
+      "functions": [
+        {
+          "name": "triangleWave",
+          "description": "a triangle wave with configurable frequency and amplitude.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "phase",
+              "type": "f32",
+              "description": "Phase offset."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn triangleWave(x: f32, frequency: f32, amplitude: f32, phase: f32) -> f32 {\n  let t = x * frequency + phase;\n  let tt = fract(t);\n  let result = abs(2.0 * tt - 1.0);\n  return (1.0 - result) * amplitude;\n}"
+        },
+        {
+          "name": "sawtoothWave",
+          "description": "a sawtooth wave with linear ramp.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "phase",
+              "type": "f32",
+              "description": "Phase offset."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn sawtoothWave(x: f32, frequency: f32, amplitude: f32, phase: f32) -> f32 {\n  let t = x * frequency + phase;\n  let tt = fract(t);\n  return tt * amplitude;\n}"
+        },
+        {
+          "name": "squareWave",
+          "description": "a square wave with configurable duty cycle.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "phase",
+              "type": "f32",
+              "description": "Phase offset."
+            },
+            {
+              "name": "dutyCycle",
+              "type": "f32",
+              "description": "Duty cycle (0-1) for wave on/off ratio."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn squareWave(x: f32, frequency: f32, amplitude: f32, phase: f32, dutyCycle: f32) -> f32 {\n  let t = x * frequency + phase;\n  let tt = fract(t);\n  return select(0.0, amplitude, tt < dutyCycle);\n}"
+        },
+        {
+          "name": "pulseWave",
+          "description": "a pulse wave with smooth falloff edges.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "phase",
+              "type": "f32",
+              "description": "Phase offset."
+            },
+            {
+              "name": "width",
+              "type": "f32",
+              "description": "Pulse width (0-1)."
+            },
+            {
+              "name": "falloff",
+              "type": "f32",
+              "description": "Smooth falloff duration."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn pulseWave(x: f32, frequency: f32, amplitude: f32, phase: f32, width: f32, falloff: f32) -> f32 {\n  let t = x * frequency + phase;\n  let tt = fract(t);\n  \n  // Create a pulse with smooth edges\n  var pulse = 0.0;\n  \n  // If tt is within the width, pulse is 1.0\n  if (tt < width) {\n    pulse = 1.0;\n  } else if (tt < width + falloff) {\n    // Smooth falloff\n    pulse = 1.0 - (tt - width) / falloff;\n  }\n  \n  return pulse * amplitude;\n}"
+        },
+        {
+          "name": "chirpWave",
+          "description": "a chirp wave with linearly changing frequency.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "startFrequency",
+              "type": "f32",
+              "description": "Starting frequency."
+            },
+            {
+              "name": "endFrequency",
+              "type": "f32",
+              "description": "Ending frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "period",
+              "type": "f32",
+              "description": "Period over which frequency changes."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn chirpWave(x: f32, startFrequency: f32, endFrequency: f32, amplitude: f32, period: f32) -> f32 {\n  // Calculate the time within the current period\n  let t = fract(x / period);\n  \n  // Calculate the frequency at the current time (linear interpolation)\n  let freq = mix(startFrequency, endFrequency, t);\n  \n  // Calculate the phase which increases with changing frequency\n  let k = (endFrequency - startFrequency) / period;\n  let phase = 2.0 * 3.14159 * (startFrequency * t + 0.5 * k * t * t);\n  \n  // Return the sine wave with the calculated phase\n  return sin(phase) * amplitude;\n}"
+        },
+        {
+          "name": "noiseWave",
+          "description": "a wave using interpolated noise for organic variation.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input position."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Wave frequency."
+            },
+            {
+              "name": "amplitude",
+              "type": "f32",
+              "description": "Wave amplitude."
+            },
+            {
+              "name": "seed",
+              "type": "f32",
+              "description": "Random seed for noise generation."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "wave value."
+          },
+          "wgslCode": "fn noiseWave(x: f32, frequency: f32, amplitude: f32, seed: f32) -> f32 {\n  // Create interpolated noise\n  let t = x * frequency;\n  let floorT = floor(t);\n  let fractT = fract(t);\n  \n  // Get four noise values and interpolate between them\n  let n0 = hash1D(floorT + seed);\n  let n1 = hash1D(floorT + 1.0 + seed);\n  \n  // Smooth interpolation\n  let u = fractT * fractT * (3.0 - 2.0 * fractT); // Smoothstep\n  \n  return mix(n0, n1, u) * amplitude;\n}"
+        }
+      ]
+    },
+    {
+      "name": "SDF Operations",
+      "slug": "sdf-operations",
+      "description": "",
+      "functions": [
+        {
+          "name": "sdfOpUnion",
+          "description": "two SDFs using union operation (logical OR).",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "signed distance field."
+          },
+          "wgslCode": "fn sdfOpUnion(distanceA: f32, distanceB: f32) -> f32 {\n  return min(distanceA, distanceB);\n}"
+        },
+        {
+          "name": "sdfOpSubtract",
+          "description": "one SDF from another (A - B).",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field to subtract."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "signed distance field."
+          },
+          "wgslCode": "fn sdfOpSubtract(distanceA: f32, distanceB: f32) -> f32 {\n  return max(distanceA, -distanceB);\n}"
+        },
+        {
+          "name": "sdfOpIntersect",
+          "description": "two SDFs (logical AND).",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "signed distance field."
+          },
+          "wgslCode": "fn sdfOpIntersect(distanceA: f32, distanceB: f32) -> f32 {\n  return max(distanceA, distanceB);\n}"
+        },
+        {
+          "name": "sdfSmoothUnion",
+          "description": "two SDFs using smooth union operation with configurable smoothing.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor for the blend."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "combined signed distance field."
+          },
+          "wgslCode": "fn sdfSmoothUnion(distanceA: f32, distanceB: f32, smoothing: f32) -> f32 {\n  let h = clamp(0.5 + 0.5 * (distanceB - distanceA) / smoothing, 0.0, 1.0);\n  return mix(distanceB, distanceA, h) - smoothing * h * (1.0 - h);\n}"
+        },
+        {
+          "name": "sdfSmoothSubtract",
+          "description": "one SDF from another with smooth blending.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field to subtract."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor for the blend."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "subtracted signed distance field."
+          },
+          "wgslCode": "fn sdfSmoothSubtract(distanceA: f32, distanceB: f32, smoothing: f32) -> f32 {\n  let h = clamp(0.5 - 0.5 * (distanceB + distanceA) / smoothing, 0.0, 1.0);\n  return mix(distanceA, -distanceB, h) + smoothing * h * (1.0 - h);\n}"
+        },
+        {
+          "name": "sdfSmoothIntersect",
+          "description": "two SDFs with smooth blending.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor for the blend."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "intersected signed distance field."
+          },
+          "wgslCode": "fn sdfSmoothIntersect(distanceA: f32, distanceB: f32, smoothing: f32) -> f32 {\n  let h = clamp(0.5 - 0.5 * (distanceB - distanceA) / smoothing, 0.0, 1.0);\n  return mix(distanceB, distanceA, h) + smoothing * h * (1.0 - h);\n}"
+        },
+        {
+          "name": "sdfChamferUnion",
+          "description": "two SDFs using chamfer union operation with hard edges.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            },
+            {
+              "name": "radius",
+              "type": "f32",
+              "description": "Chamfer radius for the edge."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "union signed distance field."
+          },
+          "wgslCode": "fn sdfChamferUnion(distanceA: f32, distanceB: f32, radius: f32) -> f32 {\n  return min(min(distanceA, distanceB), (distanceA - radius + distanceB) * 0.5);\n}"
+        },
+        {
+          "name": "sdfChamferSubtract",
+          "description": "one SDF from another using chamfer operation.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field to subtract."
+            },
+            {
+              "name": "radius",
+              "type": "f32",
+              "description": "Chamfer radius for the edge."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "subtraction signed distance field."
+          },
+          "wgslCode": "fn sdfChamferSubtract(distanceA: f32, distanceB: f32, radius: f32) -> f32 {\n  return max(max(distanceA, -distanceB), (distanceA + radius - distanceB) * 0.5);\n}"
+        },
+        {
+          "name": "sdfChamferIntersect",
+          "description": "two SDFs using chamfer operation.",
+          "params": [
+            {
+              "name": "distanceA",
+              "type": "f32",
+              "description": "First signed distance field."
+            },
+            {
+              "name": "distanceB",
+              "type": "f32",
+              "description": "Second signed distance field."
+            },
+            {
+              "name": "radius",
+              "type": "f32",
+              "description": "Chamfer radius for the edge."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "intersection signed distance field."
+          },
+          "wgslCode": "fn sdfChamferIntersect(distanceA: f32, distanceB: f32, radius: f32) -> f32 {\n  return max(max(distanceA, distanceB), (distanceA + radius + distanceB) * 0.5);\n}"
+        }
+      ]
+    },
+    {
+      "name": "SDF Transforms",
+      "slug": "sdf-transforms",
+      "description": "",
+      "functions": [
+        {
+          "name": "sdfTranslate",
+          "description": "an SDF by moving its position.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "offset",
+              "type": "vec3<f32>",
+              "description": "Translation offset."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfTranslate(position: vec3<f32>, offset: vec3<f32>) -> vec3<f32> {\n  return position - offset;\n}"
+        },
+        {
+          "name": "sdfScale",
+          "description": "an SDF uniformly or non-uniformly.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "scale",
+              "type": "vec3<f32>",
+              "description": "Scale factors for each axis."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfScale(position: vec3<f32>, scale: vec3<f32>) -> vec3<f32> {\n  return position / scale;\n}"
+        },
+        {
+          "name": "sdfRotate",
+          "description": "an SDF around a pivot point with Euler angles.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "angles",
+              "type": "vec3<f32>",
+              "description": "Rotation angles in radians (x, y, z)."
+            },
+            {
+              "name": "pivot",
+              "type": "vec3<f32>",
+              "description": "Point to rotate around."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfRotate(position: vec3<f32>, angles: vec3<f32>, pivot: vec3<f32>) -> vec3<f32> {\n  // First translate to origin relative to pivot point\n  let centered = position - pivot;\n  \n  // Create rotation matrices (inverse rotation = negative angles)\n  let cx = cos(-angles.x);\n  let sx = sin(-angles.x);\n  let cy = cos(-angles.y);\n  let sy = sin(-angles.y);\n  let cz = cos(-angles.z);\n  let sz = sin(-angles.z);\n  \n  // Rotate around X axis\n  let rx = vec3<f32>(\n    centered.x,\n    centered.y * cx - centered.z * sx,\n    centered.y * sx + centered.z * cx\n  );\n  \n  // Rotate around Y axis\n  let ry = vec3<f32>(\n    rx.x * cy + rx.z * sy,\n    rx.y,\n    -rx.x * sy + rx.z * cy\n  );\n  \n  // Rotate around Z axis\n  let rz = vec3<f32>(\n    ry.x * cz - ry.y * sz,\n    ry.x * sz + ry.y * cz,\n    ry.z\n  );\n  \n  // Translate back from pivot point\n  return rz + pivot;\n}"
+        },
+        {
+          "name": "sdfMirror",
+          "description": "an SDF across a plane defined by a normal vector.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "normal",
+              "type": "vec3<f32>",
+              "description": "Normal vector of the mirror plane."
+            },
+            {
+              "name": "offset",
+              "type": "f32",
+              "description": "Distance offset of the mirror plane."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfMirror(position: vec3<f32>, normal: vec3<f32>, offset: f32) -> vec3<f32> {\n  let n = normalize(normal);\n  let d = dot(position, n) - offset;\n  return position - 2.0 * max(0.0, d) * n;\n}"
+        },
+        {
+          "name": "sdfPolarRepeat",
+          "description": "polar repetition around an axis.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "count",
+              "type": "f32",
+              "description": "Number of repetitions around the circle."
+            },
+            {
+              "name": "axis",
+              "type": "vec3<f32>",
+              "description": "Axis to repeat around (should be normalized)."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfPolarRepeat(position: vec3<f32>, count: f32, axis: vec3<f32>) -> vec3<f32> {\n  let n = normalize(axis);\n  \n  // Project position onto axis\n  let axisProj = dot(position, n) * n;\n  let radial = position - axisProj;\n  \n  // Get angle in the plane perpendicular to axis\n  let radius = length(radial);\n  if (radius < 0.001) {\n    return position;\n  }\n  \n  let angle = atan2(radial.y, radial.x);\n  let sectorAngle = 6.28318530718 / count;\n  let snappedAngle = round(angle / sectorAngle) * sectorAngle;\n  \n  // Reconstruct position with snapped angle\n  let newRadial = radius * vec2<f32>(cos(snappedAngle), sin(snappedAngle));\n  \n  // This assumes axis is along Z - for general axis, need proper basis vectors\n  return axisProj + vec3<f32>(newRadial.x, newRadial.y, 0.0);\n}"
+        },
+        {
+          "name": "sdfCylindricalRepeat",
+          "description": "cylindrical coordinate repetition.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "angleRepeat",
+              "type": "f32",
+              "description": "Angular repetition count."
+            },
+            {
+              "name": "heightRepeat",
+              "type": "f32",
+              "description": "Height repetition interval."
+            },
+            {
+              "name": "axis",
+              "type": "vec3<f32>",
+              "description": "Cylindrical axis (should be normalized)."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfCylindricalRepeat(position: vec3<f32>, angleRepeat: f32, heightRepeat: f32, axis: vec3<f32>) -> vec3<f32> {\n  let n = normalize(axis);\n  \n  // Project onto axis for height\n  let h = dot(position, n);\n  let radial = position - h * n;\n  \n  // Repeat in height\n  let newH = h - heightRepeat * round(h / heightRepeat);\n  \n  // Repeat in angle\n  let radius = length(radial);\n  if (radius < 0.001) {\n    return newH * n;\n  }\n  \n  let angle = atan2(radial.y, radial.x);\n  let sectorAngle = 6.28318530718 / angleRepeat;\n  let newAngle = angle - sectorAngle * round(angle / sectorAngle);\n  \n  let newRadial = radius * vec2<f32>(cos(newAngle), sin(newAngle));\n  \n  // This assumes axis is along Z - for general axis, need proper basis vectors\n  return newH * n + vec3<f32>(newRadial.x, newRadial.y, 0.0);\n}"
+        },
+        {
+          "name": "sdfSphericalRepeat",
+          "description": "spherical coordinate repetition.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "phiRepeat",
+              "type": "f32",
+              "description": "Azimuthal angle repetition count."
+            },
+            {
+              "name": "thetaRepeat",
+              "type": "f32",
+              "description": "Polar angle repetition count."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfSphericalRepeat(position: vec3<f32>, phiRepeat: f32, thetaRepeat: f32) -> vec3<f32> {\n  let radius = length(position);\n  if (radius < 0.001) {\n    return position;\n  }\n  \n  // Convert to spherical coordinates\n  let theta = acos(clamp(position.z / radius, -1.0, 1.0));\n  let phi = atan2(position.y, position.x);\n  \n  // Repeat in spherical coordinates\n  let phiSector = 6.28318530718 / phiRepeat;\n  let thetaSector = 3.14159265359 / thetaRepeat;\n  \n  let newPhi = phi - phiSector * round(phi / phiSector);\n  let newTheta = theta - thetaSector * round(theta / thetaSector);\n  \n  // Convert back to Cartesian\n  let sinTheta = sin(newTheta);\n  return radius * vec3<f32>(\n    sinTheta * cos(newPhi),\n    sinTheta * sin(newPhi),\n    cos(newTheta)\n  );\n}"
+        }
+      ]
+    },
+    {
+      "name": "SDF Modifiers",
+      "slug": "sdf-modifiers",
+      "description": "",
+      "functions": [
+        {
+          "name": "sdfTwist",
+          "description": "a continuous rotation around an axis proportional to distance along that axis.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "angle",
+              "type": "f32",
+              "description": "Twist angle in radians per unit distance."
+            },
+            {
+              "name": "axis",
+              "type": "vec3<f32>",
+              "description": "Axis to twist around (should be normalized)."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfTwist(position: vec3<f32>, angle: f32, axis: vec3<f32>) -> vec3<f32> {\n  // Normalize the axis\n  let axisNorm = normalize(axis);\n  \n  // Project position onto the twist axis\n  let proj = dot(position, axisNorm);\n  \n  // Calculate twist angle based on projection along axis\n  let twistAngle = proj * angle;\n  \n  // Get sin and cos of the twist angle\n  let s = sin(twistAngle);\n  let c = cos(twistAngle);\n  \n  // Calculate vector from axis (the part that will be rotated)\n  let axisProj = proj * axisNorm;\n  let fromAxis = position - axisProj;\n  \n  // Find a perpendicular vector for the rotation\n  let basis1 = normalize(fromAxis);\n  let basis2 = cross(axisNorm, basis1);\n  \n  // Rotate using the basis vectors\n  let rotated = axisProj + \n                basis1 * length(fromAxis) * c + \n                basis2 * length(fromAxis) * s;\n  \n  return rotated;\n}"
+        },
+        {
+          "name": "sdfBend",
+          "description": "geometry along a specified axis creating a smooth curve.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "angle",
+              "type": "f32",
+              "description": "Bend angle in radians."
+            },
+            {
+              "name": "axis",
+              "type": "vec3<f32>",
+              "description": "Axis normal to the bending plane."
+            },
+            {
+              "name": "center",
+              "type": "vec3<f32>",
+              "description": "Center of the bend."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfBend(position: vec3<f32>, angle: f32, axis: vec3<f32>, center: vec3<f32>) -> vec3<f32> {\n  // Normalize the bend axis\n  let axisNorm = normalize(axis);\n  \n  // Translate position relative to bend center\n  let localPos = position - center;\n  \n  // Find perpendicular vectors to the bend axis to define the bend plane\n  var perpVec1: vec3<f32>;\n  if (abs(axisNorm.y) < 0.999) {\n    perpVec1 = normalize(cross(vec3<f32>(0.0, 1.0, 0.0), axisNorm));\n  } else {\n    perpVec1 = normalize(cross(vec3<f32>(1.0, 0.0, 0.0), axisNorm));\n  }\n  let perpVec2 = normalize(cross(axisNorm, perpVec1));\n  \n  // Project the position onto the perpendicular vectors\n  let proj1 = dot(localPos, perpVec1);\n  let proj2 = dot(localPos, perpVec2);\n  let axisProj = dot(localPos, axisNorm);\n  \n  // Calculate radius for the bend\n  let radius = proj1;\n  \n  // Calculate the angle based on the distance along the bend direction\n  let bendAngle = proj2 * angle;\n  \n  // Calculate the bent position using polar coordinates\n  let c = cos(bendAngle);\n  let s = sin(bendAngle);\n  \n  // Apply the transformation\n  let bentPos = center + \n                axisNorm * axisProj +\n                perpVec1 * (c * radius) +\n                perpVec2 * (s * radius);\n  \n  return bentPos;\n}"
+        },
+        {
+          "name": "sdfTaper",
+          "description": "a linear taper effect along an axis.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "amount",
+              "type": "f32",
+              "description": "Taper amount (0 = no taper, 1 = full taper)."
+            },
+            {
+              "name": "axis",
+              "type": "vec3<f32>",
+              "description": "Taper axis direction."
+            },
+            {
+              "name": "height",
+              "type": "f32",
+              "description": "Height over which to apply the taper."
+            },
+            {
+              "name": "offset",
+              "type": "f32",
+              "description": "Offset along the taper axis."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfTaper(position: vec3<f32>, amount: f32, axis: vec3<f32>, height: f32, offset: f32) -> vec3<f32> {\n  let axisNorm = normalize(axis);\n  \n  // Project position onto the taper axis\n  let axisPos = dot(position, axisNorm) - offset;\n  \n  // Calculate taper factor based on position along axis\n  let t = clamp(axisPos / height, 0.0, 1.0);\n  let taperFactor = 1.0 - amount * t;\n  \n  // Apply taper to the perpendicular components\n  let axisComponent = axisPos * axisNorm;\n  let perpComponent = position - dot(position, axisNorm) * axisNorm;\n  \n  return axisComponent + perpComponent * taperFactor;\n}"
+        },
+        {
+          "name": "sdfDisplace",
+          "description": "SDF using noise or other displacement functions.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to displace."
+            },
+            {
+              "name": "amount",
+              "type": "f32",
+              "description": "Displacement amount."
+            },
+            {
+              "name": "frequency",
+              "type": "f32",
+              "description": "Displacement frequency."
+            },
+            {
+              "name": "seed",
+              "type": "f32",
+              "description": "Random seed for displacement."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "position."
+          },
+          "wgslCode": "fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {\n  // Simple noise function for displacement\n  let hash3D = fn(p: vec3<f32>) -> vec3<f32> {\n    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n    p3 += dot(p3, p3.yxz + 33.33);\n    return fract((p3.xxy + p3.yxx) * p3.zyx) * 2.0 - 1.0;\n  };\n  \n  let noisePos = position * frequency + seed;\n  let displacement = hash3D(noisePos) * amount;\n  \n  return position + displacement;\n}"
+        },
+        {
+          "name": "sdfDomainRepeat",
+          "description": "domain repetition with optional warping for complex patterns.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "cellSize",
+              "type": "vec3<f32>",
+              "description": "Size of each repetition cell."
+            },
+            {
+              "name": "warpAmount",
+              "type": "f32",
+              "description": "Amount of warping to apply."
+            },
+            {
+              "name": "warpScale",
+              "type": "f32",
+              "description": "Scale of the warping effect."
+            },
+            {
+              "name": "seed",
+              "type": "f32",
+              "description": "Random seed for warping."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {\n  // Simple 3D hash function for warping\n  let hash31 = fn(p: vec3<f32>) -> f32 {\n    var p3 = fract(p * vec3<f32>(0.1031, 0.1030, 0.0973));\n    p3 += dot(p3, p3.yxz + 33.33);\n    return fract((p3.x + p3.y) * p3.z);\n  };\n  \n  // Simplex-like 3D noise function for warping\n  let noise3D = fn(x: vec3<f32>) -> f32 {\n    let p = floor(x);\n    let f = fract(x);\n    \n    return mix(\n      mix(\n        mix(hash31(p), \n            hash31(p + vec3<f32>(1.0, 0.0, 0.0)), \n            f.x),\n        mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), \n            hash31(p + vec3<f32>(1.0, 1.0, 0.0)), \n            f.x),\n        f.y),\n      mix(\n        mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), \n            hash31(p + vec3<f32>(1.0, 0.0, 1.0)), \n            f.x),\n        mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), \n            hash31(p + vec3<f32>(1.0, 1.0, 1.0)), \n            f.x),\n        f.y),\n      f.z);\n  };\n  \n  // FBM (Fractal Brownian Motion) noise for domain warping\n  let warpNoise = fn(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n    let p = x + seedVal;\n    var nx = 0.0;\n    var ny = 0.0;\n    var nz = 0.0;\n    var w = 0.5;\n    \n    for (var i = 0; i < 3; i++) {\n      nx += w * noise3D(p);\n      ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n      nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n      p *= 2.0;\n      w *= 0.5;\n    }\n    \n    return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n  };\n  \n  // Calculate warping for position\n  let warp = warpNoise(position * warpScale, seed) * warpAmount;\n  \n  // Apply warping to position\n  let warpedPos = position + warp;\n  \n  // Calculate repetition\n  return warpedPos - cellSize * round(warpedPos / cellSize);\n}"
+        },
+        {
+          "name": "sdfFiniteRepeat",
+          "description": "finite repetition with specified count along each axis.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "spacing",
+              "type": "vec3<f32>",
+              "description": "Spacing between repetitions."
+            },
+            {
+              "name": "count",
+              "type": "vec3<f32>",
+              "description": "Number of repetitions along each axis."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfFiniteRepeat(position: vec3<f32>, spacing: vec3<f32>, count: vec3<f32>) -> vec3<f32> {\n  let id = clamp(round(position / spacing), -count * 0.5, count * 0.5);\n  return position - spacing * id;\n}"
+        },
+        {
+          "name": "sdfInfiniteRepeat",
+          "description": "infinite repetition along all axes.",
+          "params": [
+            {
+              "name": "position",
+              "type": "vec3<f32>",
+              "description": "3D position to transform."
+            },
+            {
+              "name": "spacing",
+              "type": "vec3<f32>",
+              "description": "Spacing between repetitions."
+            }
+          ],
+          "returns": {
+            "type": "vec3<f32>",
+            "description": "repeated position."
+          },
+          "wgslCode": "fn sdfInfiniteRepeat(position: vec3<f32>, spacing: vec3<f32>) -> vec3<f32> {\n  return position - spacing * round(position / spacing);\n}"
+        }
+      ]
+    },
+    {
+      "name": "SDF Utilities",
+      "slug": "sdf-utilities",
+      "description": "",
+      "functions": [
+        {
+          "name": "sdfToSolid",
+          "description": "a signed distance field to a solid boolean value.",
+          "params": [
+            {
+              "name": "signedDistance",
+              "type": "f32",
+              "description": "Signed distance field value."
+            },
+            {
+              "name": "threshold",
+              "type": "f32",
+              "description": "Threshold for solid determination."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "if solid, 0.0 if not (as f32 for compatibility)."
+          },
+          "wgslCode": "fn sdfToSolid(signedDistance: f32, threshold: f32) -> f32 {\n  return select(0.0, 1.0, signedDistance <= threshold);\n}"
+        },
+        {
+          "name": "sdfToStroke",
+          "description": "a signed distance field to a stroke/outline.",
+          "params": [
+            {
+              "name": "signedDistance",
+              "type": "f32",
+              "description": "Signed distance field value."
+            },
+            {
+              "name": "thickness",
+              "type": "f32",
+              "description": "Stroke thickness."
+            },
+            {
+              "name": "center",
+              "type": "f32",
+              "description": "Center distance for the stroke."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "if within stroke, 0.0 if not."
+          },
+          "wgslCode": "fn sdfToStroke(signedDistance: f32, thickness: f32, center: f32) -> f32 {\n  return select(0.0, 1.0, abs(signedDistance - center) <= thickness * 0.5);\n}"
+        },
+        {
+          "name": "sdfToSmoothSolid",
+          "description": "a signed distance field to a smooth solid with anti-aliasing.",
+          "params": [
+            {
+              "name": "signedDistance",
+              "type": "f32",
+              "description": "Signed distance field value."
+            },
+            {
+              "name": "threshold",
+              "type": "f32",
+              "description": "Threshold for solid determination."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor for anti-aliasing."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0.0 and 1.0."
+          },
+          "wgslCode": "fn sdfToSmoothSolid(signedDistance: f32, threshold: f32, smoothing: f32) -> f32 {\n  return 1.0 - smoothstep(threshold - smoothing, threshold + smoothing, signedDistance);\n}"
+        },
+        {
+          "name": "sdfToSmoothStroke",
+          "description": "a signed distance field to a smooth stroke with anti-aliasing.",
+          "params": [
+            {
+              "name": "signedDistance",
+              "type": "f32",
+              "description": "Signed distance field value."
+            },
+            {
+              "name": "thickness",
+              "type": "f32",
+              "description": "Stroke thickness."
+            },
+            {
+              "name": "center",
+              "type": "f32",
+              "description": "Center distance for the stroke."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor for anti-aliasing."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "stroke value between 0.0 and 1.0."
+          },
+          "wgslCode": "fn sdfToSmoothStroke(signedDistance: f32, thickness: f32, center: f32, smoothing: f32) -> f32 {\n  let distance = abs(signedDistance - center);\n  return 1.0 - smoothstep(thickness * 0.5 - smoothing, thickness * 0.5 + smoothing, distance);\n}"
         }
       ]
     }
