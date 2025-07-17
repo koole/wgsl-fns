@@ -1,8 +1,7 @@
-name: Deploy to Vercel on Release
+name: Deploy to Vercel on Tag Creation
 
 on:
-  release:
-    types: [published]
+  create
 
 jobs:
   deploy:
