@@ -50,3 +50,26 @@ export const fbm = `fn fbm(p: vec2<f32>, octaves: i32) -> f32 {
   }
   return value;
 }`;
+
+/**
+ * @wgsl
+ * @name hash1D
+ * @description Generates a 1D hash value from an input value for noise generation.
+ * @param {f32} p Input value to hash.
+ * @returns {f32} Hashed value between 0 and 1.
+ */
+export const hash1D = `fn hash1D(p: f32) -> f32 {
+  // Convert to integer and apply bit manipulation
+  let x = bitcast<u32>(p + 123.456789);
+  var h = x;
+  
+  // Wang hash function
+  h = (h ^ 61u) ^ (h >> 16u);
+  h = h + (h << 3u);
+  h = h ^ (h >> 4u);
+  h = h * 0x27d4eb2du;
+  h = h ^ (h >> 15u);
+  
+  // Convert back to float and normalize
+  return f32(h) / 4294967296.0;
+}`;

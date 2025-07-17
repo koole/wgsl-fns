@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T01:22:40.113Z",
-    "totalFunctions": 16,
+    "generatedAt": "2025-07-17T11:15:36.237Z",
+    "totalFunctions": 20,
     "totalCategories": 4
   },
   "categories": [
@@ -92,6 +92,109 @@
             "description": "2D vector."
           },
           "wgslCode": "fn rotate2D(v: vec2<f32>, angle: f32) -> vec2<f32> {\n  let c = cos(angle);\n  let s = sin(angle);\n  return vec2(v.x * c - v.y * s, v.x * s + v.y * c);\n}"
+        },
+        {
+          "name": "exponentialRamp",
+          "description": "an exponential ramp function with derivative.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input value."
+            },
+            {
+              "name": "base",
+              "type": "f32",
+              "description": "Exponential base."
+            },
+            {
+              "name": "scale",
+              "type": "f32",
+              "description": "Scale factor."
+            },
+            {
+              "name": "offset",
+              "type": "f32",
+              "description": "Vertical offset."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "value and derivative."
+          },
+          "wgslCode": "fn exponentialRamp(x: f32, base: f32, scale: f32, offset: f32) -> vec2<f32> {\n  // Ensure base is positive and not 1 (which would make it linear)\n  let b = select(base, 2.71828, abs(base - 1.0) < 0.001);\n  \n  // Calculate the exponential function\n  let result = scale * pow(b, x) + offset;\n  \n  // Calculate the derivative\n  let derivative = scale * pow(b, x) * log(b);\n  \n  return vec2<f32>(result, derivative);\n}"
+        },
+        {
+          "name": "logisticCurve",
+          "description": "a logistic (S-curve) function with derivative.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input value."
+            },
+            {
+              "name": "midpoint",
+              "type": "f32",
+              "description": "Curve midpoint (inflection point)."
+            },
+            {
+              "name": "steepness",
+              "type": "f32",
+              "description": "Curve steepness factor."
+            },
+            {
+              "name": "min",
+              "type": "f32",
+              "description": "Minimum output value."
+            },
+            {
+              "name": "max",
+              "type": "f32",
+              "description": "Maximum output value."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "value and derivative."
+          },
+          "wgslCode": "fn logisticCurve(x: f32, midpoint: f32, steepness: f32, min: f32, max: f32) -> vec2<f32> {\n  // Scale factor for steepness\n  let k = max(0.001, steepness);\n  \n  // Shift x relative to midpoint\n  let z = -k * (x - midpoint);\n  \n  // Calculate the exponent\n  let expTerm = exp(z);\n  \n  // Calculate the logistic function value\n  let logistic = 1.0 / (1.0 + expTerm);\n  \n  // Scale to min-max range\n  let range = max - min;\n  let value = min + range * logistic;\n  \n  // Calculate the derivative\n  let derivative = range * k * expTerm / ((1.0 + expTerm) * (1.0 + expTerm));\n  \n  return vec2<f32>(value, derivative);\n}"
+        },
+        {
+          "name": "stepSequence",
+          "description": "a stepped sequence with optional smoothing between steps.",
+          "params": [
+            {
+              "name": "x",
+              "type": "f32",
+              "description": "Input value."
+            },
+            {
+              "name": "steps",
+              "type": "f32",
+              "description": "Number of steps in the sequence."
+            },
+            {
+              "name": "smoothing",
+              "type": "f32",
+              "description": "Smoothing factor between steps (0-1)."
+            },
+            {
+              "name": "minValue",
+              "type": "f32",
+              "description": "Minimum output value."
+            },
+            {
+              "name": "maxValue",
+              "type": "f32",
+              "description": "Maximum output value."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "value and current step index."
+          },
+          "wgslCode": "fn stepSequence(x: f32, steps: f32, smoothing: f32, minValue: f32, maxValue: f32) -> vec2<f32> {\n  // Ensure at least 1 step and positive smoothing\n  let numSteps = max(1.0, floor(steps));\n  let smoothFactor = max(0.0, smoothing);\n  \n  // Normalize x to 0-1 range\n  let normalizedX = fract(x);\n  \n  // Calculate the size of each step\n  let stepSize = 1.0 / numSteps;\n  \n  // Calculate the current step (0 to numSteps-1)\n  let currentStep = floor(normalizedX * numSteps);\n  let nextStep = fract(currentStep + 1.0);\n  \n  // Calculate progress within the current step\n  let stepProgress = fract(normalizedX * numSteps);\n  \n  // Calculate the progress values for current and next steps\n  let currentStepValue = currentStep / (numSteps - 1.0);\n  \n  // Prepare next step value, handle the last step case\n  var nextStepValue: f32 = 0.0;\n  if (currentStep >= numSteps - 1.0) {\n    nextStepValue = 1.0;\n  } else {\n    nextStepValue = nextStep / (numSteps - 1.0);\n  }\n  \n  // Apply smoothing between steps if needed\n  var result: f32 = 0.0;\n  \n  if (smoothFactor > 0.0 && stepProgress > (1.0 - smoothFactor) && numSteps > 1.0) {\n    // Calculate smoothing factor\n    let t = (stepProgress - (1.0 - smoothFactor)) / smoothFactor;\n    \n    // Smoothstep for better transition\n    let smoothT = t * t * (3.0 - 2.0 * t);\n    \n    // Interpolate between current and next step\n    result = mix(currentStepValue, nextStepValue, smoothT);\n  } else {\n    result = currentStepValue;\n  }\n  \n  // Scale to min-max range\n  let range = maxValue - minValue;\n  let finalResult = minValue + result * range;\n  \n  return vec2<f32>(finalResult, currentStep);\n}"
         }
       ]
     },
@@ -152,6 +255,22 @@
             "description": "noise value."
           },
           "wgslCode": "fn fbm(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
+        },
+        {
+          "name": "hash1D",
+          "description": "a 1D hash value from an input value for noise generation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "f32",
+              "description": "Input value to hash."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "wgslCode": "fn hash1D(p: f32) -> f32 {\n  // Convert to integer and apply bit manipulation\n  let x = bitcast<u32>(p + 123.456789);\n  var h = x;\n  \n  // Wang hash function\n  h = (h ^ 61u) ^ (h >> 16u);\n  h = h + (h << 3u);\n  h = h ^ (h >> 4u);\n  h = h * 0x27d4eb2du;\n  h = h ^ (h >> 15u);\n  \n  // Convert back to float and normalize\n  return f32(h) / 4294967296.0;\n}"
         }
       ]
     },
