@@ -94,13 +94,45 @@ describe('wgsl-fns main functionality', () => {
 
 describe('WGSL Compilation Tests', () => {
   let device;
+  let webgpuAvailable = false;
+  
+  // Check if WebGPU is available
+  async function checkWebGPUAvailability() {
+    try {
+      // Check if navigator.gpu exists (browser environment with WebGPU)
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        const adapter = await navigator.gpu.requestAdapter();
+        return !!adapter;
+      }
+      
+      // Check if we're in Node.js with webgpu package
+      if (typeof navigator === 'undefined') {
+        const { gpu } = await import('webgpu');
+        const adapter = await gpu.requestAdapter();
+        return !!adapter;
+      }
+      
+      return false;
+    } catch (error) {
+      console.log(`WebGPU not available: ${error.message}`);
+      return false;
+    }
+  }
   
   // Setup WebGPU device once for all tests
   async function setupDevice() {
     if (device) return device;
     
     try {
-      const adapter = await navigator.gpu.requestAdapter();
+      let gpu;
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        gpu = navigator.gpu;
+      } else {
+        const webgpuModule = await import('webgpu');
+        gpu = webgpuModule.gpu;
+      }
+      
+      const adapter = await gpu.requestAdapter();
       if (!adapter) {
         throw new Error('No WebGPU adapter available');
       }
@@ -111,7 +143,13 @@ describe('WGSL Compilation Tests', () => {
     }
   }
 
-  test('all WGSL functions should compile individually (with auto-resolved dependencies)', async () => {
+  test('all WGSL functions should compile individually (with auto-resolved dependencies)', async (t) => {
+    webgpuAvailable = await checkWebGPUAvailability();
+    if (!webgpuAvailable) {
+      t.skip('WebGPU not available in this environment');
+      return;
+    }
+    
     const webgpuDevice = await setupDevice();
     const failedFunctions = [];
     
@@ -172,7 +210,12 @@ describe('WGSL Compilation Tests', () => {
     console.log(`✅ All ${Object.keys(wgslFns).length} functions compiled successfully!`);
   });
 
-  test('combined functions should compile together', async () => {
+  test('combined functions should compile together', async (t) => {
+    if (!webgpuAvailable) {
+      t.skip('WebGPU not available in this environment');
+      return;
+    }
+    
     const webgpuDevice = await setupDevice();
     const functionNames = Object.keys(wgslFns);
     
@@ -217,7 +260,12 @@ describe('WGSL Compilation Tests', () => {
     console.log(`✅ All function combinations compiled successfully!`);
   });
 
-  test('dependency resolution should work correctly', async () => {
+  test('dependency resolution should work correctly', async (t) => {
+    if (!webgpuAvailable) {
+      t.skip('WebGPU not available in this environment');
+      return;
+    }
+    
     const webgpuDevice = await setupDevice();
     
     // Test functions that have dependencies with specific expected dependencies
