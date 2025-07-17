@@ -113,6 +113,9 @@ ${getFns(requiredFunctions)}
 ## Development
 
 ```bash
+# Install dependencies
+npm install
+
 # Generate documentation
 npm run docs
 
@@ -121,9 +124,25 @@ npm run build
 
 # Watch for changes during development
 npm run dev
+
+# Run tests
+npm test
+
+# Run tests with build (CI command)
+npm run test:ci
 ```
 
 Documentation is automatically generated from JSDoc comments in the source files. See [the website](https://dekoolecentrale.nl/wgsl-fns) for the complete auto-generated documentation.
+
+## Testing
+
+The package includes comprehensive tests for:
+- Individual function exports
+- `getFns()` functionality and error handling
+- WGSL syntax validation
+- Package compatibility (CommonJS, ES modules, TypeScript)
+
+Tests run automatically on pull requests via GitHub Actions.
 
 ## Release Flow
 
