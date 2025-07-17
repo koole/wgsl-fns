@@ -13,8 +13,13 @@ export * from './sdf-modifiers';
 export * from './sdf-utils';
 
 // Import individual functions for registry
-import { elasticWave, smoothStep, rotate2D, exponentialRamp, logisticCurve, stepSequence } from './math';
-import { hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D } from './noise';
+import { elasticWave, smoothStep, smoothStepVec2, rotate2D, exponentialRamp, logisticCurve, stepSequence, taylorInvSqrt4 } from './math';
+import { 
+  hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D,
+  pcg, pcg2d, pcg3d, pcg4d, xxhash32, xxhash32_2d, xxhash32_3d, xxhash32_4d,
+  rand11_sin, rand22_sin, valueNoise1D, valueNoise2D, mod289, perm4, valueNoise3D,
+  perlinNoise2D, perlinNoise3D
+} from './noise';
 import { sdfCircle, sdfBox, sdfUnion, sdfIntersection, sdfSubtraction, boxFrameSDF, cappedTorusSDF, capsuleSDF, coneSDF, cylinderSDF, ellipsoidSDF, gyroidSDF, hexagonalPrismSDF, icosahedronSDF, juliaSDF, octahedronSDF, planeSDF, pyramidSDF, rhombusSDF, roundBoxSDF, roundedConeSDF, roundedCylinderSDF, sphereSDF, tetrahedronSDF, torusSDF, triangularPrismSDF } from './sdf';
 import { palette, linearToSrgb, srgbToLinear, hue2rgb, hslToRgb } from './color';
 import { bezierCubic, easeIn, easeOut, easeInOut, elasticIn, elasticOut, backIn, backOut, springPhysics } from './animation';
@@ -29,10 +34,12 @@ export const wgslFns = {
   // Math functions
   elasticWave,
   smoothStep,
+  smoothStepVec2,
   rotate2D,
   exponentialRamp,
   logisticCurve,
   stepSequence,
+  taylorInvSqrt4,
   
   // Noise functions
   noise2D,
@@ -43,6 +50,23 @@ export const wgslFns = {
   hash3D,
   noise3D,
   warpNoise3D,
+  pcg,
+  pcg2d,
+  pcg3d,
+  pcg4d,
+  xxhash32,
+  xxhash32_2d,
+  xxhash32_3d,
+  xxhash32_4d,
+  rand11_sin,
+  rand22_sin,
+  valueNoise1D,
+  valueNoise2D,
+  mod289,
+  perm4,
+  valueNoise3D,
+  perlinNoise2D,
+  perlinNoise3D,
   
   // SDF functions
   sdfCircle,

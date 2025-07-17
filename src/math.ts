@@ -34,6 +34,20 @@ export const smoothStep = `fn smoothStep(edge0: f32, edge1: f32, x: f32) -> f32 
 
 /**
  * @wgsl
+ * @name smoothStepVec2
+ * @description Hermite interpolation between two vectors with smooth acceleration and deceleration.
+ * @param {vec2<f32>} edge0 Lower edge of interpolation range.
+ * @param {vec2<f32>} edge1 Upper edge of interpolation range.
+ * @param {vec2<f32>} x Input vector to interpolate.
+ * @returns {vec2<f32>} Smoothly interpolated vector between 0 and 1.
+ */
+export const smoothStepVec2 = `fn smoothStepVec2(edge0: vec2f, edge1: vec2f, x: vec2f) -> vec2f {
+  let t = clamp((x - edge0) / (edge1 - edge0), vec2f(0.0), vec2f(1.0));
+  return t * t * (3.0 - 2.0 * t);
+}`;
+
+/**
+ * @wgsl
  * @name rotate2D
  * @description Rotates a 2D vector by a given angle.
  * @param {vec2<f32>} v Input 2D vector to rotate.
@@ -164,4 +178,16 @@ export const stepSequence = `fn stepSequence(x: f32, steps: f32, smoothing: f32,
   let finalResult = minValue + result * range;
   
   return vec2<f32>(finalResult, currentStep);
+}`;
+
+/**
+ * @wgsl
+ * @name taylorInvSqrt4
+ * @description Taylor series inverse square root approximation for Perlin noise.
+ * @param {vec4<f32>} r Input 4D vector.
+ * @returns {vec4<f32>} Inverse square root approximation.
+ */
+// MIT License. © Stefan Gustavson, Munrocket
+export const taylorInvSqrt4 = `fn taylorInvSqrt4(r: vec4f) -> vec4f { 
+    return 1.79284291400159 - 0.85373472095314 * r; 
 }`;

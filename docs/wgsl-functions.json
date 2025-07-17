@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T14:03:49.033Z",
-    "totalFunctions": 87,
+    "generatedAt": "2025-07-17T14:46:42.224Z",
+    "totalFunctions": 106,
     "totalCategories": 10
   },
   "categories": [
@@ -73,6 +73,33 @@
           },
           "dependencies": [],
           "wgslCode": "fn smoothStep(edge0: f32, edge1: f32, x: f32) -> f32 {\n  let t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);\n  return t * t * (3.0 - 2.0 * t);\n}"
+        },
+        {
+          "name": "smoothStepVec2",
+          "description": "interpolation between two vectors with smooth acceleration and deceleration.",
+          "params": [
+            {
+              "name": "edge0",
+              "type": "vec2<f32>",
+              "description": "Lower edge of interpolation range."
+            },
+            {
+              "name": "edge1",
+              "type": "vec2<f32>",
+              "description": "Upper edge of interpolation range."
+            },
+            {
+              "name": "x",
+              "type": "vec2<f32>",
+              "description": "Input vector to interpolate."
+            }
+          ],
+          "returns": {
+            "type": "vec2<f32>",
+            "description": "interpolated vector between 0 and 1."
+          },
+          "dependencies": [],
+          "wgslCode": "fn smoothStepVec2(edge0: vec2f, edge1: vec2f, x: vec2f) -> vec2f {\n  let t = clamp((x - edge0) / (edge1 - edge0), vec2f(0.0), vec2f(1.0));\n  return t * t * (3.0 - 2.0 * t);\n}"
         },
         {
           "name": "rotate2D",
@@ -201,6 +228,23 @@
           },
           "dependencies": [],
           "wgslCode": "fn stepSequence(x: f32, steps: f32, smoothing: f32, minValue: f32, maxValue: f32) -> vec2<f32> {\n  // Ensure at least 1 step and positive smoothing\n  let numSteps = max(1.0, floor(steps));\n  let smoothFactor = max(0.0, smoothing);\n  \n  // Normalize x to 0-1 range\n  let normalizedX = fract(x);\n  \n  // Calculate the size of each step\n  let stepSize = 1.0 / numSteps;\n  \n  // Calculate the current step (0 to numSteps-1)\n  let currentStep = floor(normalizedX * numSteps);\n  let nextStep = fract(currentStep + 1.0);\n  \n  // Calculate progress within the current step\n  let stepProgress = fract(normalizedX * numSteps);\n  \n  // Calculate the progress values for current and next steps\n  let currentStepValue = currentStep / (numSteps - 1.0);\n  \n  // Prepare next step value, handle the last step case\n  var nextStepValue: f32 = 0.0;\n  if (currentStep >= numSteps - 1.0) {\n    nextStepValue = 1.0;\n  } else {\n    nextStepValue = nextStep / (numSteps - 1.0);\n  }\n  \n  // Apply smoothing between steps if needed\n  var result: f32 = 0.0;\n  \n  if (smoothFactor > 0.0 && stepProgress > (1.0 - smoothFactor) && numSteps > 1.0) {\n    // Calculate smoothing factor\n    let t = (stepProgress - (1.0 - smoothFactor)) / smoothFactor;\n    \n    // Smoothstep for better transition\n    let smoothT = t * t * (3.0 - 2.0 * t);\n    \n    // Interpolate between current and next step\n    result = mix(currentStepValue, nextStepValue, smoothT);\n  } else {\n    result = currentStepValue;\n  }\n  \n  // Scale to min-max range\n  let range = maxValue - minValue;\n  let finalResult = minValue + result * range;\n  \n  return vec2<f32>(finalResult, currentStep);\n}"
+        },
+        {
+          "name": "taylorInvSqrt4",
+          "description": "series inverse square root approximation for Perlin noise.",
+          "params": [
+            {
+              "name": "r",
+              "type": "vec4<f32>",
+              "description": "Input 4D vector."
+            }
+          ],
+          "returns": {
+            "type": "vec4<f32>",
+            "description": "square root approximation."
+          },
+          "dependencies": [],
+          "wgslCode": "fn taylorInvSqrt4(r: vec4f) -> vec4f { \n    return 1.79284291400159 - 0.85373472095314 * r; \n}"
         }
       ]
     },
@@ -362,6 +406,306 @@
             "noise3D"
           ],
           "wgslCode": "//! requires noise3D\nfn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n  var p = x + seedVal;\n  var nx = 0.0;\n  var ny = 0.0;\n  var nz = 0.0;\n  var w = 0.5;\n  \n  for (var i = 0; i < 3; i++) {\n    nx += w * noise3D(p);\n    ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n    nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n    p *= 2.0;\n    w *= 0.5;\n  }\n  \n  return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n}"
+        },
+        {
+          "name": "pcg",
+          "description": "and fast integer hash using PCG algorithm.",
+          "params": [
+            {
+              "name": "n",
+              "type": "u32",
+              "description": "Input unsigned integer to hash."
+            }
+          ],
+          "returns": {
+            "type": "u32",
+            "description": "unsigned integer value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn pcg(n: u32) -> u32 {\n    var h = n * 747796405u + 2891336453u;\n    h = ((h >> ((h >> 28u) + 4u)) ^ h) * 277803737u;\n    return (h >> 22u) ^ h;\n}"
+        },
+        {
+          "name": "pcg2d",
+          "description": "PCG hash function for fast procedural generation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<u32>",
+              "description": "Input 2D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "vec2<u32>",
+            "description": "2D unsigned integer vector."
+          },
+          "dependencies": [],
+          "wgslCode": "fn pcg2d(p: vec2u) -> vec2u {\n    var v = p * 1664525u + 1013904223u;\n    v.x += v.y * 1664525u; v.y += v.x * 1664525u;\n    v ^= v >> vec2u(16u);\n    v.x += v.y * 1664525u; v.y += v.x * 1664525u;\n    v ^= v >> vec2u(16u);\n    return v;\n}"
+        },
+        {
+          "name": "pcg3d",
+          "description": "PCG hash function for volumetric procedural generation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<u32>",
+              "description": "Input 3D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "vec3<u32>",
+            "description": "3D unsigned integer vector."
+          },
+          "dependencies": [],
+          "wgslCode": "fn pcg3d(p: vec3u) -> vec3u {\n    var v = p * 1664525u + 1013904223u;\n    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;\n    v ^= v >> vec3u(16u);\n    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;\n    return v;\n}"
+        },
+        {
+          "name": "pcg4d",
+          "description": "PCG hash function for advanced procedural generation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec4<u32>",
+              "description": "Input 4D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "vec4<u32>",
+            "description": "4D unsigned integer vector."
+          },
+          "dependencies": [],
+          "wgslCode": "fn pcg4d(p: vec4u) -> vec4u {\n    var v = p * 1664525u + 1013904223u;\n    v.x += v.y*v.w; v.y += v.z*v.x; v.z += v.x*v.y; v.w += v.y*v.z;\n    v ^= v >> vec4u(16u);\n    v.x += v.y*v.w; v.y += v.z*v.x; v.z += v.x*v.y; v.w += v.y*v.z;\n    return v;\n}"
+        },
+        {
+          "name": "xxhash32",
+          "description": "integer hash using xxHash algorithm.",
+          "params": [
+            {
+              "name": "n",
+              "type": "u32",
+              "description": "Input unsigned integer to hash."
+            }
+          ],
+          "returns": {
+            "type": "u32",
+            "description": "unsigned integer value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn xxhash32(n: u32) -> u32 {\n    var h32 = n + 374761393u;\n    h32 = 668265263u * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = 2246822519u * (h32 ^ (h32 >> 15));\n    h32 = 3266489917u * (h32 ^ (h32 >> 13));\n    return h32^(h32 >> 16);\n}"
+        },
+        {
+          "name": "xxhash32_2d",
+          "description": "xxHash for strong integer hashing in 2D.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec2<u32>",
+              "description": "Input 2D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "u32",
+            "description": "unsigned integer value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn xxhash32_2d(p: vec2u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.y + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
+        },
+        {
+          "name": "xxhash32_3d",
+          "description": "xxHash for strong integer hashing in 3D.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<u32>",
+              "description": "Input 3D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "u32",
+            "description": "unsigned integer value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn xxhash32_3d(p: vec3u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 =  p.z + p5 + p.x*p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
+        },
+        {
+          "name": "xxhash32_4d",
+          "description": "xxHash for strong integer hashing in 4D.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec4<u32>",
+              "description": "Input 4D unsigned integer vector to hash."
+            }
+          ],
+          "returns": {
+            "type": "u32",
+            "description": "unsigned integer value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn xxhash32_4d(p: vec4u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.w + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.z  * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32 ^ (h32 >> 16);\n}"
+        },
+        {
+          "name": "rand11_sin",
+          "description": "float from 1D input using sine (platform dependent).",
+          "params": [
+            {
+              "name": "n",
+              "type": "f32",
+              "description": "Input float value."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "float between 0 and 1."
+          },
+          "dependencies": [],
+          "wgslCode": "fn rand11(n: f32) -> f32 { \n    return fract(sin(n) * 43758.5453123); \n}"
+        },
+        {
+          "name": "rand22_sin",
+          "description": "float from 2D input using sine (platform dependent).",
+          "params": [
+            {
+              "name": "n",
+              "type": "vec2<f32>",
+              "description": "Input 2D vector."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "float between 0 and 1."
+          },
+          "dependencies": [],
+          "wgslCode": "fn rand22(n: vec2f) -> f32 { \n    return fract(sin(dot(n, vec2f(12.9898, 4.1414))) * 43758.5453); \n}"
+        },
+        {
+          "name": "valueNoise1D",
+          "description": "1D value noise using random interpolation.",
+          "params": [
+            {
+              "name": "p",
+              "type": "f32",
+              "description": "Input 1D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "dependencies": [
+            "rand11_sin"
+          ],
+          "wgslCode": "//! requires rand11_sin\nfn noise(p: f32) -> f32 {\n    let fl = floor(p);\n    return mix(rand11(fl), rand11(fl + 1.), fract(p));\n}"
+        },
+        {
+          "name": "valueNoise2D",
+          "description": "2D value noise using smooth interpolation.",
+          "params": [
+            {
+              "name": "n",
+              "type": "vec2<f32>",
+              "description": "Input 2D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "dependencies": [
+            "rand22_sin",
+            "smoothStepVec2"
+          ],
+          "wgslCode": "//! requires rand22_sin smoothStepVec2\nfn noise2(n: vec2f) -> f32 {\n    let d = vec2f(0., 1.);\n    let b = floor(n);\n    let f = smoothStepVec2(vec2f(0.), vec2f(1.), fract(n));\n    return mix(mix(rand22(b), rand22(b + d.yx), f.x), mix(rand22(b + d.xy), rand22(b + d.yy), f.x), f.y);\n}"
+        },
+        {
+          "name": "mod289",
+          "description": "289 operation for Perlin noise.",
+          "params": [
+            {
+              "name": "x",
+              "type": "vec4<f32>",
+              "description": "Input 4D vector."
+            }
+          ],
+          "returns": {
+            "type": "vec4<f32>",
+            "description": "of x mod 289."
+          },
+          "dependencies": [],
+          "wgslCode": "fn mod289(x: vec4f) -> vec4f { \n    return x - floor(x * (1. / 289.)) * 289.; \n}"
+        },
+        {
+          "name": "perm4",
+          "description": "function for Perlin noise.",
+          "params": [
+            {
+              "name": "x",
+              "type": "vec4<f32>",
+              "description": "Input 4D vector."
+            }
+          ],
+          "returns": {
+            "type": "vec4<f32>",
+            "description": "4D vector."
+          },
+          "dependencies": [
+            "mod289"
+          ],
+          "wgslCode": "//! requires mod289\nfn perm4(x: vec4f) -> vec4f { \n    return mod289(((x * 34.) + 1.) * x); \n}"
+        },
+        {
+          "name": "valueNoise3D",
+          "description": "value noise using permutation tables.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<f32>",
+              "description": "Input 3D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "value between 0 and 1."
+          },
+          "dependencies": [
+            "perm4"
+          ],
+          "wgslCode": "//! requires perm4\nfn noise3(p: vec3f) -> f32 {\n    let a = floor(p);\n    var d: vec3f = p - a;\n    d = d * d * (3. - 2. * d);\n\n    let b = a.xxyy + vec4f(0., 1., 0., 1.);\n    let k1 = perm4(b.xyxy);\n    let k2 = perm4(k1.xyxy + b.zzww);\n\n    let c = k2 + a.zzzz;\n    let k3 = perm4(c);\n    let k4 = perm4(c + 1.);\n\n    let o1 = fract(k3 * (1. / 41.));\n    let o2 = fract(k4 * (1. / 41.));\n\n    let o3 = o2 * d.z + o1 * (1. - d.z);\n    let o4 = o3.yw * d.x + o3.xz * (1. - d.x);\n\n    return o4.y * d.y + o4.x * (1. - d.y);\n}"
+        },
+        {
+          "name": "perlinNoise2D",
+          "description": "Perlin noise implementation.",
+          "params": [
+            {
+              "name": "P",
+              "type": "vec2<f32>",
+              "description": "Input 2D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "noise value."
+          },
+          "dependencies": [],
+          "wgslCode": "fn permute4(x: vec4f) -> vec4f { \n    return ((x * 34. + 1.) * x) % vec4f(289.); \n}\n\nfn fade2(t: vec2f) -> vec2f { \n    return t * t * t * (t * (t * 6. - 15.) + 10.); \n}\n\nfn perlinNoise2(P: vec2f) -> f32 {\n    var Pi: vec4f = floor(P.xyxy) + vec4f(0., 0., 1., 1.);\n    let Pf = fract(P.xyxy) - vec4f(0., 0., 1., 1.);\n    Pi = Pi % vec4f(289.); // To avoid truncation effects in permutation\n    let ix = Pi.xzxz;\n    let iy = Pi.yyww;\n    let fx = Pf.xzxz;\n    let fy = Pf.yyww;\n    let i = permute4(permute4(ix) + iy);\n    var gx: vec4f = 2. * fract(i * 0.0243902439) - 1.; // 1/41 = 0.024...\n    let gy = abs(gx) - 0.5;\n    let tx = floor(gx + 0.5);\n    gx = gx - tx;\n    var g00: vec2f = vec2f(gx.x, gy.x);\n    var g10: vec2f = vec2f(gx.y, gy.y);\n    var g01: vec2f = vec2f(gx.z, gy.z);\n    var g11: vec2f = vec2f(gx.w, gy.w);\n    let norm = 1.79284291400159 - 0.85373472095314 *\n        vec4f(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));\n    g00 = g00 * norm.x;\n    g01 = g01 * norm.y;\n    g10 = g10 * norm.z;\n    g11 = g11 * norm.w;\n    let n00 = dot(g00, vec2f(fx.x, fy.x));\n    let n10 = dot(g10, vec2f(fx.y, fy.y));\n    let n01 = dot(g01, vec2f(fx.z, fy.z));\n    let n11 = dot(g11, vec2f(fx.w, fy.w));\n    let fade_xy = fade2(Pf.xy);\n    let n_x = mix(vec2f(n00, n01), vec2f(n10, n11), vec2f(fade_xy.x));\n    let n_xy = mix(n_x.x, n_x.y, fade_xy.y);\n    return 2.3 * n_xy;\n}"
+        },
+        {
+          "name": "perlinNoise3D",
+          "description": "Perlin noise implementation.",
+          "params": [
+            {
+              "name": "P",
+              "type": "vec3<f32>",
+              "description": "Input 3D coordinate."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "noise value."
+          },
+          "dependencies": [
+            "taylorInvSqrt4"
+          ],
+          "wgslCode": "//! requires taylorInvSqrt4\nfn permute4(x: vec4f) -> vec4f { \n    return ((x * 34. + 1.) * x) % vec4f(289.); \n}\n\nfn fade3(t: vec3f) -> vec3f { \n    return t * t * t * (t * (t * 6. - 15.) + 10.); \n}\n\nfn perlinNoise3(P: vec3f) -> f32 {\n    var Pi0 : vec3f = floor(P); // Integer part for indexing\n    var Pi1 : vec3f = Pi0 + vec3f(1.); // Integer part + 1\n    Pi0 = Pi0 % vec3f(289.);\n    Pi1 = Pi1 % vec3f(289.);\n    let Pf0 = fract(P); // Fractional part for interpolation\n    let Pf1 = Pf0 - vec3f(1.); // Fractional part - 1.\n    let ix = vec4f(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n    let iy = vec4f(Pi0.yy, Pi1.yy);\n    let iz0 = Pi0.zzzz;\n    let iz1 = Pi1.zzzz;\n\n    let ixy = permute4(permute4(ix) + iy);\n    let ixy0 = permute4(ixy + iz0);\n    let ixy1 = permute4(ixy + iz1);\n\n    var gx0: vec4f = ixy0 / 7.;\n    var gy0: vec4f = fract(floor(gx0) / 7.) - 0.5;\n    gx0 = fract(gx0);\n    var gz0: vec4f = vec4f(0.5) - abs(gx0) - abs(gy0);\n    var sz0: vec4f = step(gz0, vec4f(0.));\n    gx0 = gx0 + sz0 * (step(vec4f(0.), gx0) - 0.5);\n    gy0 = gy0 + sz0 * (step(vec4f(0.), gy0) - 0.5);\n\n    var gx1: vec4f = ixy1 / 7.;\n    var gy1: vec4f = fract(floor(gx1) / 7.) - 0.5;\n    gx1 = fract(gx1);\n    var gz1: vec4f = vec4f(0.5) - abs(gx1) - abs(gy1);\n    var sz1: vec4f = step(gz1, vec4f(0.));\n    gx1 = gx1 - sz1 * (step(vec4f(0.), gx1) - 0.5);\n    gy1 = gy1 - sz1 * (step(vec4f(0.), gy1) - 0.5);\n\n    var g000: vec3f = vec3f(gx0.x, gy0.x, gz0.x);\n    var g100: vec3f = vec3f(gx0.y, gy0.y, gz0.y);\n    var g010: vec3f = vec3f(gx0.z, gy0.z, gz0.z);\n    var g110: vec3f = vec3f(gx0.w, gy0.w, gz0.w);\n    var g001: vec3f = vec3f(gx1.x, gy1.x, gz1.x);\n    var g101: vec3f = vec3f(gx1.y, gy1.y, gz1.y);\n    var g011: vec3f = vec3f(gx1.z, gy1.z, gz1.z);\n    var g111: vec3f = vec3f(gx1.w, gy1.w, gz1.w);\n\n    let norm0 = taylorInvSqrt4(\n        vec4f(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n    g000 = g000 * norm0.x;\n    g010 = g010 * norm0.y;\n    g100 = g100 * norm0.z;\n    g110 = g110 * norm0.w;\n    let norm1 = taylorInvSqrt4(\n        vec4f(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n    g001 = g001 * norm1.x;\n    g011 = g011 * norm1.y;\n    g101 = g101 * norm1.z;\n    g111 = g111 * norm1.w;\n\n    let n000 = dot(g000, Pf0);\n    let n100 = dot(g100, vec3f(Pf1.x, Pf0.yz));\n    let n010 = dot(g010, vec3f(Pf0.x, Pf1.y, Pf0.z));\n    let n110 = dot(g110, vec3f(Pf1.xy, Pf0.z));\n    let n001 = dot(g001, vec3f(Pf0.xy, Pf1.z));\n    let n101 = dot(g101, vec3f(Pf1.x, Pf0.y, Pf1.z));\n    let n011 = dot(g011, vec3f(Pf0.x, Pf1.yz));\n    let n111 = dot(g111, Pf1);\n\n    var fade_xyz: vec3f = fade3(Pf0);\n    let temp = vec4f(f32(fade_xyz.z)); // simplify after chrome bug fix\n    let n_z = mix(vec4f(n000, n100, n010, n110), vec4f(n001, n101, n011, n111), temp);\n    let n_yz = mix(n_z.xy, n_z.zw, vec2f(f32(fade_xyz.y))); // simplify after chrome bug fix\n    let n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n    return 2.2 * n_xyz;\n}"
         }
       ]
     },

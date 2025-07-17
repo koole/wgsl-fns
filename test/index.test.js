@@ -69,6 +69,56 @@ describe('wgsl-fns main functionality', () => {
       assert.strictEqual(openBraces, closeBraces, `Function ${name} should have balanced braces`);
     }
   });
+
+  test('dependency resolution should work correctly', () => {
+    // Test functions that have dependencies with specific expected dependencies
+    const testCases = [
+      { function: 'fbm', expectedDeps: ['hash22', 'noise2D'] },
+      { function: 'hslToRgb', expectedDeps: ['hue2rgb'] },
+      { function: 'noiseWave', expectedDeps: ['hash1D'] },
+      { function: 'noise3D', expectedDeps: ['hash31'] },
+      { function: 'warpNoise3D', expectedDeps: ['hash31', 'noise3D'] },
+      { function: 'sdfDisplace', expectedDeps: ['hash3D'] },
+      { function: 'sdfDomainRepeat', expectedDeps: ['hash31', 'noise3D', 'warpNoise3D'] }
+    ];
+    
+    for (const testCase of testCases) {
+      const combinedCode = getFns([testCase.function]);
+      
+      // Check that the main function is included
+      assert(combinedCode.includes(`fn ${testCase.function}(`), 
+        `Should contain ${testCase.function} function`);
+      
+      // Check that all expected dependencies are included
+      for (const dep of testCase.expectedDeps) {
+        assert(combinedCode.includes(`fn ${dep}(`), 
+          `Function "${testCase.function}" should include dependency "${dep}"`);
+      }
+    }
+  });
+
+  test('shared dependencies should only be included once', () => {
+    // Both noise3D and warpNoise3D depend on hash31
+    const combinedCode = getFns(['noise3D', 'warpNoise3D']);
+    
+    // Check that both functions are included
+    assert(combinedCode.includes('fn noise3D('), 'Should contain noise3D function');
+    assert(combinedCode.includes('fn warpNoise3D('), 'Should contain warpNoise3D function');
+    assert(combinedCode.includes('fn hash31('), 'Should contain hash31 dependency');
+    
+    // Count occurrences of hash31 function definition
+    const hash31Matches = combinedCode.match(/fn hash31\(/g);
+    assert(hash31Matches, 'hash31 function should be present');
+    assert.strictEqual(hash31Matches.length, 1, 'hash31 function should only appear once, not duplicated');
+    
+    // Verify the functions appear in the correct order (dependencies first)
+    const hash31Index = combinedCode.indexOf('fn hash31(');
+    const noise3DIndex = combinedCode.indexOf('fn noise3D(');
+    const warpNoise3DIndex = combinedCode.indexOf('fn warpNoise3D(');
+    
+    assert(hash31Index < noise3DIndex, 'hash31 should appear before noise3D');
+    assert(noise3DIndex < warpNoise3DIndex, 'noise3D should appear before warpNoise3D');
+  });
 });
 
 describe('WGSL Compilation Tests', () => {
@@ -234,70 +284,6 @@ describe('WGSL Compilation Tests', () => {
     }
     
     console.log(`✅ All function combinations compiled successfully!`);
-  });
-
-  test('dependency resolution should work correctly', async (t) => {
-    if (!webgpuAvailable) {
-      t.skip('WebGPU not available in this environment');
-      return;
-    }
-    
-    const webgpuDevice = await setupDevice();
-    
-    // Test functions that have dependencies with specific expected dependencies
-    const testCases = [
-      { function: 'fbm', expectedDeps: ['hash22', 'noise2D'] },
-      { function: 'hslToRgb', expectedDeps: ['hue2rgb'] },
-      { function: 'noiseWave', expectedDeps: ['hash1D'] },
-      { function: 'noise3D', expectedDeps: ['hash31'] },
-      { function: 'warpNoise3D', expectedDeps: ['hash31', 'noise3D'] },
-      { function: 'sdfDisplace', expectedDeps: ['hash3D'] },
-      { function: 'sdfDomainRepeat', expectedDeps: ['hash31', 'noise3D', 'warpNoise3D'] }
-    ];
-    
-    for (const testCase of testCases) {
-      try {
-        const combinedCode = getFns([testCase.function]);
-        
-        // Check that the main function is included
-        assert(combinedCode.includes(`fn ${testCase.function}(`), 
-          `Should contain ${testCase.function} function`);
-        
-        // Check that all expected dependencies are included
-        for (const dep of testCase.expectedDeps) {
-          assert(combinedCode.includes(`fn ${dep}(`), 
-            `Function "${testCase.function}" should include dependency "${dep}"`);
-        }
-        
-        // Test compilation
-        const shaderCode = `
-          ${combinedCode}
-          
-          @compute @workgroup_size(1)
-          fn main() {
-            // Just compile the functions, don't call them
-          }
-        `;
-        
-        const shaderModule = webgpuDevice.createShaderModule({
-          label: `Test shader for ${testCase.function} with dependencies`,
-          code: shaderCode
-        });
-        
-        const compilationInfo = await shaderModule.getCompilationInfo();
-        const errors = compilationInfo.messages.filter(msg => msg.type === 'error');
-        
-        if (errors.length > 0) {
-          const errorMessages = errors.map(err => `Line ${err.lineNum}: ${err.message}`).join('\n');
-          assert.fail(`Function "${testCase.function}" with dependencies should compile without errors. Errors: ${errorMessages}`);
-        }
-        
-      } catch (error) {
-        assert.fail(`Failed to test function "${testCase.function}" with dependencies: ${error.message}`);
-      }
-    }
-    
-    console.log(`✅ All functions with dependencies compiled successfully!`);
   });
 
   // Clean up after all tests complete
