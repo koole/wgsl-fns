@@ -79,8 +79,8 @@ describe('wgsl-fns main functionality', () => {
 
   test('all functions should have basic WGSL syntax', () => {
     for (const [name, fn] of Object.entries(wgslFns)) {
-      // Basic WGSL function syntax validation
-      assert(fn.match(/^fn\s+\w+\s*\(/), `Function ${name} should start with valid WGSL function declaration`);
+      // Basic WGSL function syntax validation (may have magic comments at start)
+      assert(fn.match(/(?:^\/\/!\s*requires\s+.+\n)?fn\s+\w+\s*\(/), `Function ${name} should start with valid WGSL function declaration (optionally preceded by magic comment)`);
       assert(fn.includes('{'), `Function ${name} should contain opening brace`);
       assert(fn.includes('}'), `Function ${name} should contain closing brace`);
       

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T12:05:01.354Z",
+    "generatedAt": "2025-07-17T12:27:54.131Z",
     "totalFunctions": 87,
     "totalCategories": 10
   },
@@ -233,7 +233,7 @@
             "type": "f32",
             "description": "value typically in range [-1, 1]."
           },
-          "wgslCode": "fn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2<f32>(0.0, 0.0)), f - vec2<f32>(0.0, 0.0)),\n        dot(hash22(i + vec2<f32>(1.0, 0.0)), f - vec2<f32>(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2<f32>(0.0, 1.0)), f - vec2<f32>(0.0, 1.0)),\n        dot(hash22(i + vec2<f32>(1.0, 1.0)), f - vec2<f32>(1.0, 1.0)), u.x), u.y);\n}"
+          "wgslCode": "//! requires hash22\nfn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2<f32>(0.0, 0.0)), f - vec2<f32>(0.0, 0.0)),\n        dot(hash22(i + vec2<f32>(1.0, 0.0)), f - vec2<f32>(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2<f32>(0.0, 1.0)), f - vec2<f32>(0.0, 1.0)),\n        dot(hash22(i + vec2<f32>(1.0, 1.0)), f - vec2<f32>(1.0, 1.0)), u.x), u.y);\n}"
         },
         {
           "name": "fbm",
@@ -254,7 +254,7 @@
             "type": "f32",
             "description": "noise value."
           },
-          "wgslCode": "fn fbm(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
+          "wgslCode": "//! requires noise2D\nfn fbm(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
         },
         {
           "name": "hash1D",
@@ -318,7 +318,7 @@
             "type": "f32",
             "description": "value between 0 and 1."
           },
-          "wgslCode": "fn noise3D(x: vec3<f32>) -> f32 {\n  let p = floor(x);\n  let f = fract(x);\n  \n  return mix(\n    mix(\n      mix(hash31(p), \n          hash31(p + vec3<f32>(1.0, 0.0, 0.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 0.0)), \n          f.x),\n      f.y),\n    mix(\n      mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 0.0, 1.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 1.0)), \n          f.x),\n      f.y),\n    f.z);\n}"
+          "wgslCode": "//! requires hash31\nfn noise3D(x: vec3<f32>) -> f32 {\n  let p = floor(x);\n  let f = fract(x);\n  \n  return mix(\n    mix(\n      mix(hash31(p), \n          hash31(p + vec3<f32>(1.0, 0.0, 0.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 0.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 0.0)), \n          f.x),\n      f.y),\n    mix(\n      mix(hash31(p + vec3<f32>(0.0, 0.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 0.0, 1.0)), \n          f.x),\n      mix(hash31(p + vec3<f32>(0.0, 1.0, 1.0)), \n          hash31(p + vec3<f32>(1.0, 1.0, 1.0)), \n          f.x),\n      f.y),\n    f.z);\n}"
         },
         {
           "name": "warpNoise3D",
@@ -339,7 +339,7 @@
             "type": "vec3<f32>",
             "description": "warp vector with values between -1 and 1."
           },
-          "wgslCode": "fn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n  var p = x + seedVal;\n  var nx = 0.0;\n  var ny = 0.0;\n  var nz = 0.0;\n  var w = 0.5;\n  \n  for (var i = 0; i < 3; i++) {\n    nx += w * noise3D(p);\n    ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n    nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n    p *= 2.0;\n    w *= 0.5;\n  }\n  \n  return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n}"
+          "wgslCode": "//! requires noise3D\nfn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {\n  var p = x + seedVal;\n  var nx = 0.0;\n  var ny = 0.0;\n  var nz = 0.0;\n  var w = 0.5;\n  \n  for (var i = 0; i < 3; i++) {\n    nx += w * noise3D(p);\n    ny += w * noise3D(p + vec3<f32>(13.5, 41.3, 17.8));\n    nz += w * noise3D(p + vec3<f32>(31.2, 23.7, 11.9));\n    p *= 2.0;\n    w *= 0.5;\n  }\n  \n  return vec3<f32>(nx, ny, nz) * 2.0 - 1.0;\n}"
         }
       ]
     },
@@ -1109,7 +1109,7 @@
             "type": "vec3<f32>",
             "description": "color values."
           },
-          "wgslCode": "fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hue2rgb(p, q, h + 1.0 / 3.0),\n    hue2rgb(p, q, h),\n    hue2rgb(p, q, h - 1.0 / 3.0)\n  );\n}"
+          "wgslCode": "//! requires hue2rgb\nfn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hue2rgb(p, q, h + 1.0 / 3.0),\n    hue2rgb(p, q, h),\n    hue2rgb(p, q, h - 1.0 / 3.0)\n  );\n}"
         }
       ]
     },
@@ -1538,7 +1538,7 @@
             "type": "f32",
             "description": "wave value."
           },
-          "wgslCode": "fn noiseWave(x: f32, frequency: f32, amplitude: f32, seed: f32) -> f32 {\n  // Create interpolated noise\n  let t = x * frequency;\n  let floorT = floor(t);\n  let fractT = fract(t);\n  \n  // Get four noise values and interpolate between them\n  let n0 = hash1D(floorT + seed);\n  let n1 = hash1D(floorT + 1.0 + seed);\n  \n  // Smooth interpolation\n  let u = fractT * fractT * (3.0 - 2.0 * fractT); // Smoothstep\n  \n  return mix(n0, n1, u) * amplitude;\n}"
+          "wgslCode": "//! requires hash1D\nfn noiseWave(x: f32, frequency: f32, amplitude: f32, seed: f32) -> f32 {\n  // Create interpolated noise\n  let t = x * frequency;\n  let floorT = floor(t);\n  let fractT = fract(t);\n  \n  // Get four noise values and interpolate between them\n  let n0 = hash1D(floorT + seed);\n  let n1 = hash1D(floorT + 1.0 + seed);\n  \n  // Smooth interpolation\n  let u = fractT * fractT * (3.0 - 2.0 * fractT); // Smoothstep\n  \n  return mix(n0, n1, u) * amplitude;\n}"
         }
       ]
     },
@@ -2079,7 +2079,7 @@
             "type": "vec3<f32>",
             "description": "position."
           },
-          "wgslCode": "fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {\n  let noisePos = position * frequency + seed;\n  let displacement = hash3D(noisePos) * amount;\n  \n  return position + displacement;\n}"
+          "wgslCode": "//! requires hash3D\nfn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {\n  let noisePos = position * frequency + seed;\n  let displacement = hash3D(noisePos) * amount;\n  \n  return position + displacement;\n}"
         },
         {
           "name": "sdfDomainRepeat",
@@ -2115,7 +2115,7 @@
             "type": "vec3<f32>",
             "description": "repeated position."
           },
-          "wgslCode": "fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {\n  // Calculate warping for position\n  let warp = warpNoise3D(position * warpScale, seed) * warpAmount;\n  \n  // Apply warping to position\n  let warpedPos = position + warp;\n  \n  // Calculate repetition\n  return warpedPos - cellSize * round(warpedPos / cellSize);\n}"
+          "wgslCode": "//! requires warpNoise3D\nfn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {\n  // Calculate warping for position\n  let warp = warpNoise3D(position * warpScale, seed) * warpAmount;\n  \n  // Apply warping to position\n  let warpedPos = position + warp;\n  \n  // Calculate repetition\n  return warpedPos - cellSize * round(warpedPos / cellSize);\n}"
         },
         {
           "name": "sdfFiniteRepeat",

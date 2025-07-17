@@ -19,8 +19,10 @@ export const hash22 = `fn hash22(p: vec2<f32>) -> vec2<f32> {
  * @description Generates 2D Perlin-style noise for procedural textures and patterns.
  * @param {vec2<f32>} p Input 2D coordinate.
  * @returns {f32} Noise value typically in range [-1, 1].
+ * @requires hash22
  */
-export const noise2D = `fn noise2D(p: vec2<f32>) -> f32 {
+export const noise2D = `//! requires hash22
+fn noise2D(p: vec2<f32>) -> f32 {
   let i = floor(p);
   let f = fract(p);
   let u = f * f * (3.0 - 2.0 * f);
@@ -38,8 +40,10 @@ export const noise2D = `fn noise2D(p: vec2<f32>) -> f32 {
  * @param {vec2<f32>} p Input 2D coordinate.
  * @param {i32} octaves Number of noise octaves to combine.
  * @returns {f32} Combined noise value.
+ * @requires noise2D
  */
-export const fbm = `fn fbm(p: vec2<f32>, octaves: i32) -> f32 {
+export const fbm = `//! requires noise2D
+fn fbm(p: vec2<f32>, octaves: i32) -> f32 {
   var value = 0.0;
   var amplitude = 0.5;
   var frequency = 1.0;
@@ -106,8 +110,10 @@ export const hash3D = `fn hash3D(p: vec3<f32>) -> vec3<f32> {
  * @description Generates 3D noise using trilinear interpolation.
  * @param {vec3<f32>} x Input 3D position for noise generation.
  * @returns {f32} Noise value between 0 and 1.
+ * @requires hash31
  */
-export const noise3D = `fn noise3D(x: vec3<f32>) -> f32 {
+export const noise3D = `//! requires hash31
+fn noise3D(x: vec3<f32>) -> f32 {
   let p = floor(x);
   let f = fract(x);
   
@@ -138,8 +144,10 @@ export const noise3D = `fn noise3D(x: vec3<f32>) -> f32 {
  * @param {vec3<f32>} x Input 3D position.
  * @param {f32} seedVal Random seed for variation.
  * @returns {vec3<f32>} 3D warp vector with values between -1 and 1.
+ * @requires noise3D
  */
-export const warpNoise3D = `fn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {
+export const warpNoise3D = `//! requires noise3D
+fn warpNoise3D(x: vec3<f32>, seedVal: f32) -> vec3<f32> {
   var p = x + seedVal;
   var nx = 0.0;
   var ny = 0.0;

@@ -1,28 +1,39 @@
 // Function dependency mappings
-// Each function can declare what other functions it depends on
+// Dependencies are now parsed from magic comments in function code
 
 import type { WgslFunctionName } from './functions';
+import { wgslFns } from './functions';
 
 /**
- * Dependency map - each key is a function name, value is array of its dependencies
+ * Parse dependencies from a WGSL function string using magic comments
+ * @param functionCode The WGSL function code string
+ * @returns Array of dependency function names
  */
-export const functionDependencies: Record<string, WgslFunctionName[]> = {
-  // Noise functions - only direct dependencies needed
-  'noise2D': ['hash22'],
-  'fbm': ['noise2D'], // Will automatically include hash22 via noise2D
-  'noise3D': ['hash31'],
-  'warpNoise3D': ['noise3D'], // Will automatically include hash31 via noise3D
+function parseDependencies(functionCode: string): WgslFunctionName[] {
+  const magicCommentMatch = functionCode.match(/^\/\/!\s*requires\s+(.+)$/m);
+  if (!magicCommentMatch) {
+    return [];
+  }
   
-  // Color functions
-  'hslToRgb': ['hue2rgb'],
+  // Split by spaces and filter out empty strings
+  return magicCommentMatch[1]
+    .split(/\s+/)
+    .filter(dep => dep.length > 0) as WgslFunctionName[];
+}
+
+/**
+ * Get direct dependencies for a function by parsing its magic comment
+ * @param functionName The function name to get dependencies for
+ * @returns Array of direct dependency function names
+ */
+function getDirectDependencies(functionName: WgslFunctionName): WgslFunctionName[] {
+  const functionCode = wgslFns[functionName];
+  if (!functionCode) {
+    return [];
+  }
   
-  // Wave functions
-  'noiseWave': ['hash1D'],
-  
-  // SDF modifier functions
-  'sdfDisplace': ['hash3D'],
-  'sdfDomainRepeat': ['warpNoise3D'], // Will automatically include noise3D and hash31
-};
+  return parseDependencies(functionCode);
+}
 
 /**
  * Recursively resolve all dependencies for a given function
@@ -39,7 +50,7 @@ export function resolveDependencies(
   }
   
   resolved.add(functionName);
-  const deps = functionDependencies[functionName] || [];
+  const deps = getDirectDependencies(functionName);
   const allDeps: WgslFunctionName[] = [];
   
   // First, resolve dependencies of dependencies

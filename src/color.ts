@@ -62,8 +62,10 @@ export const hue2rgb = `fn hue2rgb(p: f32, q: f32, t: f32) -> f32 {
  * @description Converts HSL (Hue, Saturation, Lightness) color to RGB.
  * @param {vec3<f32>} hsl HSL color values (hue: 0-1, saturation: 0-1, lightness: 0-1).
  * @returns {vec3<f32>} RGB color values.
+ * @requires hue2rgb
  */
-export const hslToRgb = `fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {
+export const hslToRgb = `//! requires hue2rgb
+fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {
   let h = hsl.x;
   let s = hsl.y;
   let l = hsl.z;

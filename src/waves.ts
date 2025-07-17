@@ -115,8 +115,10 @@ export const chirpWave = `fn chirpWave(x: f32, startFrequency: f32, endFrequency
  * @param {f32} amplitude Wave amplitude.
  * @param {f32} seed Random seed for noise generation.
  * @returns {f32} Noise-based wave value.
+ * @requires hash1D
  */
-export const noiseWave = `fn noiseWave(x: f32, frequency: f32, amplitude: f32, seed: f32) -> f32 {
+export const noiseWave = `//! requires hash1D
+fn noiseWave(x: f32, frequency: f32, amplitude: f32, seed: f32) -> f32 {
   // Create interpolated noise
   let t = x * frequency;
   let floorT = floor(t);

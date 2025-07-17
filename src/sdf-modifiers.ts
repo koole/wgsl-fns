@@ -126,8 +126,10 @@ export const sdfTaper = `fn sdfTaper(position: vec3<f32>, amount: f32, axis: vec
  * @param {f32} frequency Displacement frequency.
  * @param {f32} seed Random seed for displacement.
  * @returns {vec3<f32>} Displaced position.
+ * @requires hash3D
  */
-export const sdfDisplace = `fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {
+export const sdfDisplace = `//! requires hash3D
+fn sdfDisplace(position: vec3<f32>, amount: f32, frequency: f32, seed: f32) -> vec3<f32> {
   let noisePos = position * frequency + seed;
   let displacement = hash3D(noisePos) * amount;
   
@@ -144,8 +146,10 @@ export const sdfDisplace = `fn sdfDisplace(position: vec3<f32>, amount: f32, fre
  * @param {f32} warpScale Scale of the warping effect.
  * @param {f32} seed Random seed for warping.
  * @returns {vec3<f32>} Domain repeated position.
+ * @requires warpNoise3D
  */
-export const sdfDomainRepeat = `fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {
+export const sdfDomainRepeat = `//! requires warpNoise3D
+fn sdfDomainRepeat(position: vec3<f32>, cellSize: vec3<f32>, warpAmount: f32, warpScale: f32, seed: f32) -> vec3<f32> {
   // Calculate warping for position
   let warp = warpNoise3D(position * warpScale, seed) * warpAmount;
   

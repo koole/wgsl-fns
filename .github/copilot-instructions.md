@@ -44,9 +44,10 @@ This is an npm package that exports WGSL (WebGPU Shading Language) functions as 
 ## Key Features
 
 ### Automatic Dependency Resolution
-- Functions declare only direct dependencies in `src/dependencies.ts`
-- `getFns(functionNames)` automatically includes all recursive dependencies
+- Functions declare direct dependencies using magic comments (`//! requires dep1 dep2`)
+- `getFns(functionNames)` automatically includes all recursive dependencies by parsing these comments
 - Smart dependency ordering prevents circular dependencies
+- Dependencies are visible inline with function code for better developer experience
 - Examples:
   - `getFns(['fbm'])` → includes `noise2D` + `hash22`
   - `getFns(['sdfDomainRepeat'])` → includes `warpNoise3D` + `noise3D` + `hash31`
@@ -69,7 +70,7 @@ This is an npm package that exports WGSL (WebGPU Shading Language) functions as 
 ### Adding New Functions
 1. **Create the function** in appropriate category file with JSDoc comments including `@wgsl` tag
 2. **Export from category file** and add to `src/functions.ts` registry
-3. **Add dependencies** to `src/dependencies.ts` if the function calls other WGSL functions
+3. **Add dependencies** using magic comments at the start of the function if it calls other WGSL functions
 4. **Run tests** to ensure compilation and dependency resolution work correctly
 
 ### Function Format
@@ -80,18 +81,22 @@ This is an npm package that exports WGSL (WebGPU Shading Language) functions as 
  * @description Clear description of what the function does.
  * @param {type} paramName Parameter description.
  * @returns {type} Return value description.
+ * @requires dependency1 dependency2 (if function has dependencies)
  */
-export const functionName = `fn functionName(param: type) -> returnType {
-  // WGSL implementation
+export const functionName = `//! requires dependency1 dependency2
+fn functionName(param: type) -> returnType {
+  // WGSL implementation using dependency1() and dependency2()
   return result;
 }`;
 ```
 
-### Dependency Management
-- Only declare **direct dependencies** in `functionDependencies`
-- Use function names as keys, array of direct dependency names as values
-- Recursive dependencies are automatically resolved
+### Dependency Management (Magic Comments)
+- Declare **direct dependencies** using `//! requires` magic comments at the start of function code
+- Add corresponding `@requires` JSDoc tags for documentation visibility
+- Use space-separated dependency names: `//! requires dep1 dep2 dep3`
+- Recursive dependencies are automatically resolved by parsing these comments
 - Test dependency resolution with `getFns(['functionName'])`
+- Dependencies are visible to users importing individual functions
 
 ### WGSL Guidelines
 - All functions should use valid WGSL syntax
