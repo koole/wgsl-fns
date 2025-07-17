@@ -33,6 +33,22 @@ console.log(shaderCode);
 // Output: Combined string with all three functions
 ```
 
+### TypeScript Support
+
+The package includes full TypeScript support with type definitions. Import the `WgslFunctionName` type for type-safe function selection:
+
+```typescript
+import type { WgslFunctionName } from 'wgsl-fns';
+import { getFns } from 'wgsl-fns';
+
+// Type-safe function selection
+const mathFunctions: WgslFunctionName[] = ['elasticWave', 'smoothStep', 'rotate2D'];
+const shaderCode = getFns(mathFunctions);
+
+// TypeScript will provide autocomplete and catch typos
+const invalidFunction: WgslFunctionName[] = ['typoFunction']; // ❌ TypeScript error
+```
+
 ### Use the default export
 
 ```javascript
@@ -44,19 +60,37 @@ console.log(Object.keys(wgslFns)); // List all available functions
 
 ## API Reference
 
-### `getFns(functionNames: string[]): string`
+### `getFns(functionNames: WgslFunctionName[]): string`
 
 Returns a combined string containing all requested WGSL functions.
 
 **Parameters:**
-- `functionNames`: Array of function names to include
+- `functionNames`: Array of function names to include (TypeScript users get autocomplete and type safety)
 
 **Returns:**
 - Combined string with all functions separated by double newlines
 
+### Exported Types
+
+#### `WgslFunctionName`
+
+A union type of all available function names for type-safe function selection:
+
+```typescript
+import type { WgslFunctionName } from 'wgsl-fns';
+
+// Valid function names include:
+// 'elasticWave', 'smoothStep', 'noise2D', 'fbm', 'sdfCircle', 'sdfBox', 
+// 'palette', 'hslToRgb', 'rotate2D', 'rotate3D', 'clamp01', 'remap', etc.
+```
+
 **Example:**
-```javascript
+```typescript
 import { getFns } from 'wgsl-fns';
+import type { WgslFunctionName } from 'wgsl-fns';
+
+// Type-safe function selection
+const requiredFunctions: WgslFunctionName[] = ['elasticWave', 'smoothStep'];
 
 const shader = `
 @vertex
@@ -72,7 +106,7 @@ fn fs_main() -> @location(0) vec4<f32> {
     return vec4<f32>(wave, wave, wave, 1.0);
 }
 
-${getFns(['elasticWave', 'smoothStep'])}
+${getFns(requiredFunctions)}
 `;
 ```
 
