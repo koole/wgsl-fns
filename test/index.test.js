@@ -1,28 +1,7 @@
 // Test for the main wgsl-fns functionality
 import { test, describe } from 'node:test';
 import assert from 'node:assert';
-import { create, globals } from 'webgpu';
 import { getFns, wgslFns } from '../dist/wgsl-fns.esm.js';
-
-// Setup WebGPU for compilation testing
-Object.assign(globalThis, globals);
-const navigator = { gpu: create([]) };
-
-// Ensure cleanup when the process exits
-process.on('exit', () => {
-  delete globalThis.navigator;
-});
-
-// Handle termination signals
-process.on('SIGINT', () => {
-  delete globalThis.navigator;
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  delete globalThis.navigator;
-  process.exit(0);
-});
 
 describe('wgsl-fns main functionality', () => {
   test('getFns should return combined functions for valid function names', () => {
@@ -95,24 +74,25 @@ describe('wgsl-fns main functionality', () => {
 describe('WGSL Compilation Tests', () => {
   let device;
   let webgpuAvailable = false;
+  let webgpuGpu = null;
   
   // Check if WebGPU is available
   async function checkWebGPUAvailability() {
-    try {
-      // Check if navigator.gpu exists (browser environment with WebGPU)
-      if (typeof navigator !== 'undefined' && navigator.gpu) {
-        const adapter = await navigator.gpu.requestAdapter();
-        return !!adapter;
-      }
-      
-      // Check if we're in Node.js with webgpu package
-      if (typeof navigator === 'undefined') {
-        const { gpu } = await import('webgpu');
-        const adapter = await gpu.requestAdapter();
-        return !!adapter;
-      }
-      
+    // Skip WebGPU in CI environments to avoid native crashes
+    if (process.env.CI || process.env.GITHUB_ACTIONS) {
+      console.log('CI environment detected - skipping WebGPU tests');
       return false;
+    }
+    
+    try {
+      // Try to setup WebGPU dynamically
+      const { create, globals } = await import('webgpu');
+      Object.assign(globalThis, globals);
+      webgpuGpu = create([]);
+      
+      // Check if we can get an adapter
+      const adapter = await webgpuGpu.requestAdapter();
+      return !!adapter;
     } catch (error) {
       console.log(`WebGPU not available: ${error.message}`);
       return false;
@@ -124,15 +104,11 @@ describe('WGSL Compilation Tests', () => {
     if (device) return device;
     
     try {
-      let gpu;
-      if (typeof navigator !== 'undefined' && navigator.gpu) {
-        gpu = navigator.gpu;
-      } else {
-        const webgpuModule = await import('webgpu');
-        gpu = webgpuModule.gpu;
+      if (!webgpuGpu) {
+        throw new Error('WebGPU not properly initialized');
       }
       
-      const adapter = await gpu.requestAdapter();
+      const adapter = await webgpuGpu.requestAdapter();
       if (!adapter) {
         throw new Error('No WebGPU adapter available');
       }
