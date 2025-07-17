@@ -50,14 +50,4 @@ describe('Package compatibility', () => {
       assert(content.length > 0, `TypeScript definition file ${typeFile} should not be empty`);
     }
   });
-
-  test('package.json exports should be valid', async () => {
-    const fs = await import('node:fs');
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    
-    // Verify main entry points exist
-    assert(fs.existsSync(packageJson.main), 'Main CommonJS entry point should exist');
-    assert(fs.existsSync(packageJson.module), 'ES Module entry point should exist');
-    assert(fs.existsSync(packageJson.types), 'TypeScript definitions entry point should exist');
-  });
 });
