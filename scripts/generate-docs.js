@@ -77,10 +77,17 @@ function parseFile(filePath) {
     const descTag = comment.tags.find(tag => tag.tag === 'description');
     const paramTags = comment.tags.filter(tag => tag.tag === 'param');
     const returnTag = comment.tags.find(tag => tag.tag === 'returns');
+    const requiresTags = comment.tags.filter(tag => tag.tag === 'requires');
     
     if (nameTag) {
       const functionName = nameTag.name;
       const wgslCode = exports[functionName] || '';
+      
+      // Extract dependencies from magic comments in WGSL code
+      const magicCommentMatch = wgslCode.match(/^\/\/!\s*requires\s+(.+)$/m);
+      const dependencies = magicCommentMatch 
+        ? magicCommentMatch[1].split(/\s+/).filter(dep => dep.length > 0)
+        : [];
       
       functions.push({
         name: functionName,
@@ -94,6 +101,7 @@ function parseFile(filePath) {
           type: returnTag.type,
           description: returnTag.description
         } : null,
+        dependencies: dependencies,
         wgslCode: wgslCode
       });
     }

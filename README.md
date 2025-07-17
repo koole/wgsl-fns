@@ -33,6 +33,19 @@ console.log(shaderCode);
 // Output: Combined string with all three functions
 ```
 
+### Automatic Dependency Resolution
+
+Some functions depend on other functions (e.g., `fbm` depends on `noise2D` and `hash22`). The `getFns()` function automatically includes all required dependencies:
+
+```javascript
+import { getFns } from 'wgsl-fns';
+
+// This automatically includes noise2D and hash22 dependencies
+const shaderCode = getFns(['fbm']);
+console.log(shaderCode);
+// Output: Contains hash22, noise2D, and fbm functions in correct order
+```
+
 ### TypeScript Support
 
 The package includes full TypeScript support with type definitions. Import the `WgslFunctionName` type for type-safe function selection:
@@ -133,6 +146,36 @@ npm run test:ci
 ```
 
 Documentation is automatically generated from JSDoc comments in the source files. See [the website](https://dekoolecentrale.nl/wgsl-fns) for the complete auto-generated documentation.
+
+## Contributing
+
+### Adding New Functions
+
+To add a new WGSL function to the library:
+
+1. **Create the function** in the appropriate category file (e.g., `src/math.ts`, `src/noise.ts`)
+2. **Add JSDoc documentation** with `@wgsl` tag, parameters, and return type
+3. **Declare dependencies** using magic comments if the function calls other WGSL functions:
+
+```typescript
+/**
+ * @wgsl
+ * @name myFunction
+ * @description What the function does
+ * @param {f32} x Input parameter
+ * @returns {f32} Output value
+ * @requires dependency1 dependency2
+ */
+export const myFunction = `//! requires dependency1 dependency2
+fn myFunction(x: f32) -> f32 {
+  return dependency1(x) + dependency2(x);
+}`;
+```
+
+4. **Export from category file** and add to `src/functions.ts` registry
+5. **Run tests** to ensure compilation: `npm test`
+
+The build system automatically generates documentation and type definitions.
 
 ## Testing
 
