@@ -4,7 +4,7 @@ A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings f
 
 ## Available Functions
 
-For a complete list of all available functions with detailed documentation, parameters, and examples, see **[FUNCTIONS.md](./FUNCTIONS.md)**.
+For a complete list of all available functions with detailed documentation, parameters, and examples, see **[the documentation website](http://localhost:3000/wgsl-fns)**.
 
 ## Installation
 
@@ -89,7 +89,7 @@ npm run build
 npm run dev
 ```
 
-Documentation is automatically generated from JSDoc comments in the source files. See [FUNCTIONS.md](./FUNCTIONS.md) for the complete auto-generated documentation.
+Documentation is automatically generated from JSDoc comments in the source files. See [the website](http://localhost:3000/wgsl-fns) for the complete auto-generated documentation.
 
 ## Release Flow
 
