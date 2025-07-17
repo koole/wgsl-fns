@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2025-07-17T12:32:02.020Z",
+    "generatedAt": "2025-07-17T14:03:49.033Z",
     "totalFunctions": 87,
     "totalCategories": 10
   },
@@ -366,9 +366,9 @@
       ]
     },
     {
-      "name": "Signed Distance Fields",
-      "slug": "signed-distance-fields",
-      "description": "SDF functions for procedural geometry and ray marching techniques.",
+      "name": "SDF Primitives",
+      "slug": "sdf-primitives",
+      "description": "Basic SDF shapes and primitive geometry functions for ray marching.",
       "functions": [
         {
           "name": "sdfCircle",
@@ -1171,7 +1171,7 @@
     {
       "name": "Animation & Easing",
       "slug": "animation---easing",
-      "description": "",
+      "description": "Easing functions and animation curves for smooth transitions.",
       "functions": [
         {
           "name": "bezierCubic",
@@ -1396,7 +1396,7 @@
     {
       "name": "Wave Functions",
       "slug": "wave-functions",
-      "description": "",
+      "description": "Wave generation functions for oscillations and periodic patterns.",
       "functions": [
         {
           "name": "triangleWave",
@@ -1617,7 +1617,7 @@
     {
       "name": "SDF Operations",
       "slug": "sdf-operations",
-      "description": "",
+      "description": "Boolean operations for combining and modifying signed distance fields.",
       "functions": [
         {
           "name": "sdfOpUnion",
@@ -1852,7 +1852,7 @@
     {
       "name": "SDF Transforms",
       "slug": "sdf-transforms",
-      "description": "",
+      "description": "Spatial transformation functions for positioning and orienting SDFs.",
       "functions": [
         {
           "name": "sdfTranslate",
@@ -2043,7 +2043,7 @@
     {
       "name": "SDF Modifiers",
       "slug": "sdf-modifiers",
-      "description": "",
+      "description": "Deformation and domain manipulation functions for SDFs.",
       "functions": [
         {
           "name": "sdfTwist",
@@ -2268,7 +2268,7 @@
     {
       "name": "SDF Utilities",
       "slug": "sdf-utilities",
-      "description": "",
+      "description": "Utility functions for rendering and post-processing SDFs.",
       "functions": [
         {
           "name": "sdfToSolid",

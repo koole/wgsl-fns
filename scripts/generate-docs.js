@@ -17,7 +17,7 @@ const outputFile = path.join(__dirname, '../docs/wgsl-functions.json');
 const categories = {
   'Math & Utility': 'math.ts',
   'Noise & Procedural': 'noise.ts', 
-  'Signed Distance Fields': 'sdf.ts',
+  'SDF Primitives': 'sdf.ts',
   'Color & Graphics': 'color.ts',
   'Animation & Easing': 'animation.ts',
   'Wave Functions': 'waves.ts',
@@ -157,8 +157,14 @@ function getCategoryDescription(categoryName) {
   const descriptions = {
     'Math & Utility': 'Mathematical functions and general utilities for shader calculations.',
     'Noise & Procedural': 'Noise generation and procedural pattern functions for textures and effects.',
-    'Signed Distance Fields': 'SDF functions for procedural geometry and ray marching techniques.',
-    'Color & Graphics': 'Color space conversion and palette generation functions.'
+    'SDF Primitives': 'Basic SDF shapes and primitive geometry functions for ray marching.',
+    'Color & Graphics': 'Color space conversion and palette generation functions.',
+    'Animation & Easing': 'Easing functions and animation curves for smooth transitions.',
+    'Wave Functions': 'Wave generation functions for oscillations and periodic patterns.',
+    'SDF Operations': 'Boolean operations for combining and modifying signed distance fields.',
+    'SDF Transforms': 'Spatial transformation functions for positioning and orienting SDFs.',
+    'SDF Modifiers': 'Deformation and domain manipulation functions for SDFs.',
+    'SDF Utilities': 'Utility functions for rendering and post-processing SDFs.'
   };
   return descriptions[categoryName] || '';
 }
