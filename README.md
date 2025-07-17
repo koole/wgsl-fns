@@ -4,7 +4,7 @@ A collection of WGSL (WebGPU Shading Language) functions as JavaScript strings f
 
 ## Available Functions
 
-For a complete list of all available functions with detailed documentation, parameters, and examples, see **[the documentationwebsite](http:s//dekoolecentrale.nl/wgsl-fns)**.
+For a complete list of all available functions with detailed documentation, parameters, and examples, see **[the documentation website](https://dekoolecentrale.nl/wgsl-fns)**.
 
 ## Installation
 
@@ -89,7 +89,7 @@ npm run build
 npm run dev
 ```
 
-Documentation is automatically generated from JSDoc comments in the source files. See [the website](http:s//dekoolecentrale.nl/wgsl-fns) for the complete auto-generated documentation.
+Documentation is automatically generated from JSDoc comments in the source files. See [the website](https://dekoolecentrale.nl/wgsl-fns) for the complete auto-generated documentation.
 
 ## Release Flow
 
