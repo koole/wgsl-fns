@@ -25,10 +25,21 @@
     "shaders",
     "glsl",
     "graphics",
-    "gpu"
+    "gpu",
+    "functions",
+    "library",
+    "shader-functions"
   ],
-  "author": "",
+  "author": "Leon Koole <leon@koole.io>",
   "license": "MIT",
+  "homepage": "https://dekoolecentrale.nl/wgsl-fns",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koole/wgsl-fns.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koole/wgsl-fns/issues"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
