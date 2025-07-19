@@ -432,11 +432,11 @@ fn noise3(p: vec3f) -> f32 {
  * @returns {f32} Perlin noise value.
  */
 // MIT License. © Stefan Gustavson, Munrocket
-export const perlinNoise2D = `fn permute4(x: vec4f) -> vec4f { 
+export const perlinNoise2D = `fn perlinNoise2_permute4(x: vec4f) -> vec4f { 
     return ((x * 34. + 1.) * x) % vec4f(289.); 
 }
 
-fn fade2(t: vec2f) -> vec2f { 
+fn perlinNoise2_fade2(t: vec2f) -> vec2f { 
     return t * t * t * (t * (t * 6. - 15.) + 10.); 
 }
 
@@ -448,7 +448,7 @@ fn perlinNoise2(P: vec2f) -> f32 {
     let iy = Pi.yyww;
     let fx = Pf.xzxz;
     let fy = Pf.yyww;
-    let i = permute4(permute4(ix) + iy);
+    let i = perlinNoise2_permute4(perlinNoise2_permute4(ix) + iy);
     var gx: vec4f = 2. * fract(i * 0.0243902439) - 1.; // 1/41 = 0.024...
     let gy = abs(gx) - 0.5;
     let tx = floor(gx + 0.5);
@@ -467,7 +467,7 @@ fn perlinNoise2(P: vec2f) -> f32 {
     let n10 = dot(g10, vec2f(fx.y, fy.y));
     let n01 = dot(g01, vec2f(fx.z, fy.z));
     let n11 = dot(g11, vec2f(fx.w, fy.w));
-    let fade_xy = fade2(Pf.xy);
+    let fade_xy = perlinNoise2_fade2(Pf.xy);
     let n_x = mix(vec2f(n00, n01), vec2f(n10, n11), vec2f(fade_xy.x));
     let n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 2.3 * n_xy;
@@ -483,11 +483,11 @@ fn perlinNoise2(P: vec2f) -> f32 {
  */
 // MIT License. © Stefan Gustavson, Munrocket
 export const perlinNoise3D = `//! requires taylorInvSqrt4
-fn permute4(x: vec4f) -> vec4f { 
+fn perlinNoise3_permute4(x: vec4f) -> vec4f { 
     return ((x * 34. + 1.) * x) % vec4f(289.); 
 }
 
-fn fade3(t: vec3f) -> vec3f { 
+fn perlinNoise3_fade3(t: vec3f) -> vec3f { 
     return t * t * t * (t * (t * 6. - 15.) + 10.); 
 }
 
@@ -503,9 +503,9 @@ fn perlinNoise3(P: vec3f) -> f32 {
     let iz0 = Pi0.zzzz;
     let iz1 = Pi1.zzzz;
 
-    let ixy = permute4(permute4(ix) + iy);
-    let ixy0 = permute4(ixy + iz0);
-    let ixy1 = permute4(ixy + iz1);
+    let ixy = perlinNoise3_permute4(perlinNoise3_permute4(ix) + iy);
+    let ixy0 = perlinNoise3_permute4(ixy + iz0);
+    let ixy1 = perlinNoise3_permute4(ixy + iz1);
 
     var gx0: vec4f = ixy0 / 7.;
     var gy0: vec4f = fract(floor(gx0) / 7.) - 0.5;
@@ -554,10 +554,263 @@ fn perlinNoise3(P: vec3f) -> f32 {
     let n011 = dot(g011, vec3f(Pf0.x, Pf1.yz));
     let n111 = dot(g111, Pf1);
 
-    var fade_xyz: vec3f = fade3(Pf0);
+    var fade_xyz: vec3f = perlinNoise3_fade3(Pf0);
     let temp = vec4f(f32(fade_xyz.z)); // simplify after chrome bug fix
     let n_z = mix(vec4f(n000, n100, n010, n110), vec4f(n001, n101, n011, n111), temp);
     let n_yz = mix(n_z.xy, n_z.zw, vec2f(f32(fade_xyz.y))); // simplify after chrome bug fix
     let n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
     return 2.2 * n_xyz;
+}`;
+
+/**
+ * @wgsl
+ * @name simplexNoise2D
+ * @description 2D simplex noise implementation for efficient 2D procedural generation.
+ * @param {vec2<f32>} v Input 2D coordinate.
+ * @returns {f32} Simplex noise value typically in range [-1, 1].
+ */
+export const simplexNoise2D = `fn snoise2D_permute3(x: vec3<f32>) -> vec3<f32> {
+    return ((x * 34.0 + 1.0) * x) % vec3<f32>(289.0);
+}
+
+fn snoise2D(v: vec2<f32>) -> f32 {
+    let C = vec4<f32>(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    var i = floor(v + dot(v, C.yy));
+    let x0 = v - i + dot(i, C.xx);
+    
+    var i1: vec2<f32>;
+    if (x0.x > x0.y) {
+        i1 = vec2<f32>(1.0, 0.0);
+    } else {
+        i1 = vec2<f32>(0.0, 1.0);
+    }
+    
+    var x12 = x0.xyxy + C.xxzz;
+    x12 = vec4<f32>(x12.xy - i1, x12.zw);
+    
+    i = i % vec2<f32>(289.0);
+    let p = snoise2D_permute3(snoise2D_permute3(i.y + vec3<f32>(0.0, i1.y, 1.0)) + i.x + vec3<f32>(0.0, i1.x, 1.0));
+    
+    var m = max(0.5 - vec3<f32>(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), vec3<f32>(0.0));
+    m = m * m;
+    m = m * m;
+    
+    let x = 2.0 * fract(p * C.www) - 1.0;
+    let h = abs(x) - 0.5;
+    let ox = floor(x + 0.5);
+    let a0 = x - ox;
+    
+    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+    
+    var g: vec3<f32>;
+    g.x = a0.x * x0.x + h.x * x0.y;
+    g.y = a0.y * x12.x + h.y * x12.y;
+    g.z = a0.z * x12.z + h.z * x12.w;
+    
+    return 130.0 * dot(m, g);
+}`;
+
+/**
+ * @wgsl
+ * @name simplexNoise3D
+ * @description 3D simplex noise implementation for volumetric procedural generation.
+ * @param {vec3<f32>} v Input 3D coordinate.
+ * @returns {f32} Simplex noise value typically in range [-1, 1].
+ */
+export const simplexNoise3D = `fn snoise3D_permute4(x: vec4<f32>) -> vec4<f32> {
+    return ((x * 34.0 + 1.0) * x) % vec4<f32>(289.0);
+}
+
+fn snoise3D_taylorInvSqrt4(r: vec4<f32>) -> vec4<f32> {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+fn snoise3D(v: vec3<f32>) -> f32 {
+    let C = vec2<f32>(1.0 / 6.0, 1.0 / 3.0);
+    let D = vec4<f32>(0.0, 0.5, 1.0, 2.0);
+    
+    // First corner
+    var i = floor(v + dot(v, C.yyy));
+    let x0 = v - i + dot(i, C.xxx);
+    
+    // Other corners
+    let g = step(x0.yzx, x0.xyz);
+    let l = 1.0 - g;
+    let i1 = min(g.xyz, l.zxy);
+    let i2 = max(g.xyz, l.zxy);
+    
+    // x0 = x0 - 0. + 0.0 * C
+    let x1 = x0 - i1 + 1.0 * C.xxx;
+    let x2 = x0 - i2 + 2.0 * C.xxx;
+    let x3 = x0 - 1.0 + 3.0 * C.xxx;
+    
+    // Permutations
+    i = i % vec3<f32>(289.0);
+    let p = snoise3D_permute4(snoise3D_permute4(snoise3D_permute4(
+        i.z + vec4<f32>(0.0, i1.z, i2.z, 1.0)) +
+        i.y + vec4<f32>(0.0, i1.y, i2.y, 1.0)) +
+        i.x + vec4<f32>(0.0, i1.x, i2.x, 1.0));
+    
+    // Gradients
+    // (N*N points uniformly over a square, mapped onto an octahedron.)
+    let n_ = 1.0 / 7.0; // N=7
+    let ns = n_ * D.wyz - D.xzx;
+    
+    let j = p - 49.0 * floor(p * ns.z * ns.z); // mod(p,N*N)
+    
+    let x_ = floor(j * ns.z);
+    let y_ = floor(j - 7.0 * x_); // mod(j,N)
+    
+    let x = x_ * ns.x + ns.yyyy;
+    let y = y_ * ns.x + ns.yyyy;
+    let h = 1.0 - abs(x) - abs(y);
+    
+    let b0 = vec4<f32>(x.xy, y.xy);
+    let b1 = vec4<f32>(x.zw, y.zw);
+    
+    let s0 = floor(b0) * 2.0 + 1.0;
+    let s1 = floor(b1) * 2.0 + 1.0;
+    let sh = -step(h, vec4<f32>(0.0));
+    
+    let a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+    let a1 = b1.xzyw + s1.xzyw * sh.zzww;
+    
+    var p0 = vec3<f32>(a0.xy, h.x);
+    var p1 = vec3<f32>(a0.zw, h.y);
+    var p2 = vec3<f32>(a1.xy, h.z);
+    var p3 = vec3<f32>(a1.zw, h.w);
+    
+    // Normalise gradients
+    let norm = snoise3D_taylorInvSqrt4(vec4<f32>(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    
+    // Mix final noise value
+    var m = max(0.6 - vec4<f32>(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), vec4<f32>(0.0));
+    m = m * m;
+    return 42.0 * dot(m * m, vec4<f32>(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}`;
+
+/**
+ * @wgsl
+ * @name simplexNoise4D
+ * @description 4D simplex noise implementation for high-quality procedural generation.
+ * @param {vec4<f32>} v Input 4D coordinate.
+ * @returns {f32} Simplex noise value typically in range [-1, 1].
+ * @requires mod289 taylorInvSqrt4
+ */
+export const simplexNoise4D = `//! requires mod289 taylorInvSqrt4
+fn snoise_permute4(x: vec4<f32>) -> vec4<f32> {
+    return mod289(((x * 34.0) + 10.0) * x);
+}
+
+fn snoise_mod289f(x: f32) -> f32 {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+fn snoise_permute(x: f32) -> f32 {
+    return snoise_mod289f(((x * 34.0) + 10.0) * x);
+}
+
+fn snoise_taylorInvSqrt(r: f32) -> f32 {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+fn snoise_grad4(j: f32, ip: vec4<f32>) -> vec4<f32> {
+    let ones = vec4(1.0, 1.0, 1.0, -1.0);
+
+    var p: vec4<f32>;
+    var s: vec4<f32>;
+
+    p = vec4(floor(fract(vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0, p.w);
+    p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
+    s = select(vec4(0.0), vec4(1.0), p < vec4(0.0));
+    p = vec4(p.xyz + (s.xyz * 2.0 - 1.0) * s.www, p.w);
+
+    return p;
+}
+
+fn snoise(v: vec4<f32>) -> f32 {
+    let C: vec4<f32> = vec4(
+        0.138196601125011, // (5 - sqrt(5))/20  G4
+        0.276393202250021, // 2 * G4
+        0.414589803375032, // 3 * G4
+        -0.447213595499958 // -1 + 4 * G4
+    );
+
+    // (sqrt(5) - 1)/4 = F4, used once below
+    let F4: f32 = 0.309016994374947451;
+
+    // First corner
+    var i: vec4<f32> = floor(v + dot(v, vec4(F4)));
+    var x0: vec4<f32> = v - i + dot(i, C.xxxx);
+
+    // Other corners
+
+    // Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)
+    var i0: vec4<f32>;
+    var isX: vec3<f32> = step(x0.yzw, x0.xxx);
+    var isYZ: vec3<f32> = step(x0.zww, x0.yyz);
+
+    //  i0.x = dot( isX, vec3( 1.0 ) );
+    i0.x = isX.x + isX.y + isX.z;
+    var minusX = 1.0 - isX;
+    i0.y = minusX.x;
+    i0.z = minusX.y;
+    i0.w = minusX.z;
+
+    //  i0.y += dot( isYZ.xy, vec2( 1.0 ) );
+    i0.y += isYZ.x + isYZ.y;
+    var minusY = 1.0 - isYZ;
+    i0.z += minusY.x;
+    i0.w += minusY.y;
+    i0.z += isYZ.z;
+    i0.w += minusY.z;
+
+    // i0 now contains the unique values 0,1,2,3 in each channel
+    var i3: vec4<f32> = vec4<f32>(clamp(i0, vec4(0.0), vec4(1.0)));
+    var i2: vec4<f32> = clamp(i0 - vec4(1.0), vec4(0.0), vec4(1.0));
+    var i1: vec4<f32> = clamp(i0 - vec4(2.0), vec4(0.0), vec4(1.0));
+
+    //  x0 = x0 - 0.0 + 0.0 * C.xxxx
+    //  x1 = x0 - i1  + 1.0 * C.xxxx
+    //  x2 = x0 - i2  + 2.0 * C.xxxx
+    //  x3 = x0 - i3  + 3.0 * C.xxxx
+    //  x4 = x0 - 1.0 + 4.0 * C.xxxx
+    var x1: vec4<f32> = x0 - i1 + C.xxxx;
+    var x2: vec4<f32> = x0 - i2 + C.yyyy;
+    var x3: vec4<f32> = x0 - i3 + C.zzzz;
+    var x4: vec4<f32> = x0 + C.wwww;
+
+    // Permutations
+    i = mod289(i);
+    var j0: f32 = snoise_permute(snoise_permute(snoise_permute(snoise_permute(i.w) + i.z) + i.y) + i.x);
+    var j1: vec4<f32> = snoise_permute4(snoise_permute4(snoise_permute4(snoise_permute4(i.w + vec4(i1.w, i2.w, i3.w, 1.0)) + i.z + vec4(i1.z, i2.z, i3.z, 1.0)) + i.y + vec4(i1.y, i2.y, i3.y, 1.0)) + i.x + vec4(i1.x, i2.x, i3.x, 1.0));
+
+    // Gradients: 7x7x6 points over a cube, mapped onto a 4-cross polytope
+    // 7*7*6 = 294, which is close to the ring size 17*17 = 289.
+    var ip: vec4<f32> = vec4(1.0 / 294.0, 1.0 / 49.0, 1.0 / 7.0, 0.0);
+
+    var p0: vec4<f32> = snoise_grad4(j0, ip);
+    var p1: vec4<f32> = snoise_grad4(j1.x, ip);
+    var p2: vec4<f32> = snoise_grad4(j1.y, ip);
+    var p3: vec4<f32> = snoise_grad4(j1.z, ip);
+    var p4: vec4<f32> = snoise_grad4(j1.w, ip);
+
+    // Normalise gradients
+    var norm: vec4<f32> = taylorInvSqrt4(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    p4 *= snoise_taylorInvSqrt(dot(p4, p4));
+
+    // Mix contributions from the five corners
+    var m0: vec3<f32> = max(0.6 - vec3(dot(x0, x0), dot(x1, x1), dot(x2, x2)), vec3(0.0));
+    var m1: vec2<f32> = max(0.6 - vec2(dot(x3, x3), dot(x4, x4)), vec2(0.0));
+    m0 = m0 * m0;
+    m1 = m1 * m1;
+    return 49.0 * (dot(m0 * m0, vec3(dot(p0, x0), dot(p1, x1), dot(p2, x2))) + dot(m1 * m1, vec2(dot(p3, x3), dot(p4, x4))));
 }`;

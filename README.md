@@ -167,13 +167,20 @@ To add a new WGSL function to the library:
  * @requires dependency1 dependency2
  */
 export const myFunction = `//! requires dependency1 dependency2
+fn myFunction_helper(x: f32) -> f32 {
+  // Helper function prefixed with main function name
+  return x * 2.0;
+}
+
 fn myFunction(x: f32) -> f32 {
-  return dependency1(x) + dependency2(x);
+  return dependency1(x) + myFunction_helper(dependency2(x));
 }`;
 ```
 
 4. **Export from category file** and add to `src/functions.ts` registry
 5. **Run tests** to ensure compilation: `npm test`
+
+**Important**: If your function uses helper functions that are only used within that function, prefix them with the main function name (e.g., `myFunction_helper`) to prevent naming collisions with other functions in the library.
 
 The build system automatically generates documentation and type definitions.
 

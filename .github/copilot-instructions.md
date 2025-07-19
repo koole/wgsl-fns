@@ -84,9 +84,14 @@ This is an npm package that exports WGSL (WebGPU Shading Language) functions as 
  * @requires dependency1 dependency2 (if function has dependencies)
  */
 export const functionName = `//! requires dependency1 dependency2
+fn functionName_helperFunction(param: type) -> returnType {
+  // Helper function prefixed with main function name
+  return value;
+}
+
 fn functionName(param: type) -> returnType {
   // WGSL implementation using dependency1() and dependency2()
-  return result;
+  return functionName_helperFunction(param);
 }`;
 ```
 
@@ -97,6 +102,13 @@ fn functionName(param: type) -> returnType {
 - Recursive dependencies are automatically resolved by parsing these comments
 - Test dependency resolution with `getFns(['functionName'])`
 - Dependencies are visible to users importing individual functions
+
+### Helper Function Guidelines
+- **Prefix helper functions** with the main function name to prevent naming collisions
+- Use format `mainFunctionName_helperName` for all inlined helper functions
+- Helper functions should only be used within their parent function
+- This prevents conflicts when multiple functions use similar helper names
+- Examples: `snoise2D_permute3`, `perlinNoise3_taylorInvSqrt4`, `fbm_lacunarity`
 
 ### WGSL Guidelines
 - All functions should use valid WGSL syntax

@@ -18,7 +18,7 @@ import {
   hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D,
   pcg, pcg2d, pcg3d, pcg4d, xxhash32, xxhash32_2d, xxhash32_3d, xxhash32_4d,
   rand11_sin, rand22_sin, valueNoise1D, valueNoise2D, mod289, perm4, valueNoise3D,
-  perlinNoise2D, perlinNoise3D
+  perlinNoise2D, perlinNoise3D, simplexNoise2D, simplexNoise3D, simplexNoise4D
 } from './noise';
 import { sdfCircle, sdfBox, sdfUnion, sdfIntersection, sdfSubtraction, boxFrameSDF, cappedTorusSDF, capsuleSDF, coneSDF, cylinderSDF, ellipsoidSDF, gyroidSDF, hexagonalPrismSDF, icosahedronSDF, juliaSDF, octahedronSDF, planeSDF, pyramidSDF, rhombusSDF, roundBoxSDF, roundedConeSDF, roundedCylinderSDF, sphereSDF, tetrahedronSDF, torusSDF, triangularPrismSDF } from './sdf';
 import { palette, linearToSrgb, srgbToLinear, hue2rgb, hslToRgb } from './color';
@@ -67,6 +67,9 @@ export const wgslFns = {
   valueNoise3D,
   perlinNoise2D,
   perlinNoise3D,
+  simplexNoise2D,
+  simplexNoise3D,
+  simplexNoise4D,
   
   // SDF functions
   sdfCircle,
