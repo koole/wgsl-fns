@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2025-07-19T11:36:53.302Z",
+    "generatedAt": "2025-07-19T12:12:09.966Z",
     "totalFunctions": 109,
     "totalCategories": 10
   },
@@ -493,7 +493,7 @@
           "wgslCode": "fn xxhash32(n: u32) -> u32 {\n    var h32 = n + 374761393u;\n    h32 = 668265263u * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = 2246822519u * (h32 ^ (h32 >> 15));\n    h32 = 3266489917u * (h32 ^ (h32 >> 13));\n    return h32^(h32 >> 16);\n}"
         },
         {
-          "name": "xxhash32_2d",
+          "name": "xxhash322d",
           "description": "xxHash for strong integer hashing in 2D.",
           "params": [
             {
@@ -507,10 +507,10 @@
             "description": "unsigned integer value."
           },
           "dependencies": [],
-          "wgslCode": "fn xxhash32_2d(p: vec2u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.y + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
+          "wgslCode": "fn xxhash322d(p: vec2u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.y + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
         },
         {
-          "name": "xxhash32_3d",
+          "name": "xxhash323d",
           "description": "xxHash for strong integer hashing in 3D.",
           "params": [
             {
@@ -524,10 +524,10 @@
             "description": "unsigned integer value."
           },
           "dependencies": [],
-          "wgslCode": "fn xxhash32_3d(p: vec3u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 =  p.z + p5 + p.x*p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
+          "wgslCode": "fn xxhash323d(p: vec3u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 =  p.z + p5 + p.x*p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32^(h32 >> 16);\n}"
         },
         {
-          "name": "xxhash32_4d",
+          "name": "xxhash324d",
           "description": "xxHash for strong integer hashing in 4D.",
           "params": [
             {
@@ -541,10 +541,10 @@
             "description": "unsigned integer value."
           },
           "dependencies": [],
-          "wgslCode": "fn xxhash32_4d(p: vec4u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.w + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.z  * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32 ^ (h32 >> 16);\n}"
+          "wgslCode": "fn xxhash324d(p: vec4u) -> u32 {\n    let p2 = 2246822519u; let p3 = 3266489917u;\n    let p4 = 668265263u; let p5 = 374761393u;\n    var h32 = p.w + p5 + p.x * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.y * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 += p.z  * p3;\n    h32 = p4 * ((h32 << 17) | (h32 >> (32 - 17)));\n    h32 = p2 * (h32^(h32 >> 15));\n    h32 = p3 * (h32^(h32 >> 13));\n    return h32 ^ (h32 >> 16);\n}"
         },
         {
-          "name": "rand11_sin",
+          "name": "rand11Sin",
           "description": "float from 1D input using sine (platform dependent).",
           "params": [
             {
@@ -561,7 +561,7 @@
           "wgslCode": "fn rand11(n: f32) -> f32 { \n    return fract(sin(n) * 43758.5453123); \n}"
         },
         {
-          "name": "rand22_sin",
+          "name": "rand22Sin",
           "description": "float from 2D input using sine (platform dependent).",
           "params": [
             {
@@ -592,9 +592,9 @@
             "description": "value between 0 and 1."
           },
           "dependencies": [
-            "rand11_sin"
+            "rand11Sin"
           ],
-          "wgslCode": "//! requires rand11_sin\nfn noise(p: f32) -> f32 {\n    let fl = floor(p);\n    return mix(rand11(fl), rand11(fl + 1.), fract(p));\n}"
+          "wgslCode": "//! requires rand11Sin\nfn noise(p: f32) -> f32 {\n    let fl = floor(p);\n    return mix(rand11(fl), rand11(fl + 1.), fract(p));\n}"
         },
         {
           "name": "valueNoise2D",
@@ -611,10 +611,10 @@
             "description": "value between 0 and 1."
           },
           "dependencies": [
-            "rand22_sin",
+            "rand22Sin",
             "smoothStepVec2"
           ],
-          "wgslCode": "//! requires rand22_sin smoothStepVec2\nfn noise2(n: vec2f) -> f32 {\n    let d = vec2f(0., 1.);\n    let b = floor(n);\n    let f = smoothStepVec2(vec2f(0.), vec2f(1.), fract(n));\n    return mix(mix(rand22(b), rand22(b + d.yx), f.x), mix(rand22(b + d.xy), rand22(b + d.yy), f.x), f.y);\n}"
+          "wgslCode": "//! requires rand22Sin smoothStepVec2\nfn noise2(n: vec2f) -> f32 {\n    let d = vec2f(0., 1.);\n    let b = floor(n);\n    let f = smoothStepVec2(vec2f(0.), vec2f(1.), fract(n));\n    return mix(mix(rand22(b), rand22(b + d.yx), f.x), mix(rand22(b + d.xy), rand22(b + d.yy), f.x), f.y);\n}"
         },
         {
           "name": "mod289",
@@ -879,7 +879,7 @@
           "wgslCode": "fn sdfSubtraction(d1: f32, d2: f32) -> f32 {\n  return max(-d1, d2);\n}"
         },
         {
-          "name": "boxFrameSDF",
+          "name": "sdfBoxFrame",
           "description": "a signed distance field for a 3D box frame (hollow box).",
           "params": [
             {
@@ -903,10 +903,10 @@
             "description": "distance to the box frame surface."
           },
           "dependencies": [],
-          "wgslCode": "fn boxFrameSDF(position: vec3<f32>, size: vec3<f32>, thickness: f32) -> f32 {\n  let q = abs(position) - size;\n  let w = abs(q + thickness) - thickness;\n  return min(min(\n    length(max(vec3<f32>(q.x, w.y, w.z), vec3<f32>(0.0))) + min(max(q.x, max(w.y, w.z)), 0.0),\n    length(max(vec3<f32>(w.x, q.y, w.z), vec3<f32>(0.0))) + min(max(w.x, max(q.y, w.z)), 0.0)),\n    length(max(vec3<f32>(w.x, w.y, q.z), vec3<f32>(0.0))) + min(max(w.x, max(w.y, q.z)), 0.0));\n}"
+          "wgslCode": "fn sdfBoxFrame(position: vec3<f32>, size: vec3<f32>, thickness: f32) -> f32 {\n  let q = abs(position) - size;\n  let w = abs(q + thickness) - thickness;\n  return min(min(\n    length(max(vec3<f32>(q.x, w.y, w.z), vec3<f32>(0.0))) + min(max(q.x, max(w.y, w.z)), 0.0),\n    length(max(vec3<f32>(w.x, q.y, w.z), vec3<f32>(0.0))) + min(max(w.x, max(q.y, w.z)), 0.0)),\n    length(max(vec3<f32>(w.x, w.y, q.z), vec3<f32>(0.0))) + min(max(w.x, max(w.y, q.z)), 0.0));\n}"
         },
         {
-          "name": "cappedTorusSDF",
+          "name": "sdfCappedTorus",
           "description": "a signed distance field for a capped torus.",
           "params": [
             {
@@ -935,10 +935,10 @@
             "description": "distance to the capped torus surface."
           },
           "dependencies": [],
-          "wgslCode": "fn cappedTorusSDF(position: vec3<f32>, majorRadius: f32, minorRadius: f32, angle: f32) -> f32 {\n  let sc = vec2<f32>(sin(angle), cos(angle));\n  let q = vec3<f32>(abs(position.x), position.y, position.z);\n  let k = select(\n    length(q.xy), \n    dot(q.xy, sc),\n    sc.y * q.x > sc.x * q.y\n  );\n  return sqrt(dot(q, q) + \n              majorRadius * majorRadius - \n              2.0 * majorRadius * k) - \n              minorRadius;\n}"
+          "wgslCode": "fn sdfCappedTorus(position: vec3<f32>, majorRadius: f32, minorRadius: f32, angle: f32) -> f32 {\n  let sc = vec2<f32>(sin(angle), cos(angle));\n  let q = vec3<f32>(abs(position.x), position.y, position.z);\n  let k = select(\n    length(q.xy), \n    dot(q.xy, sc),\n    sc.y * q.x > sc.x * q.y\n  );\n  return sqrt(dot(q, q) + \n              majorRadius * majorRadius - \n              2.0 * majorRadius * k) - \n              minorRadius;\n}"
         },
         {
-          "name": "capsuleSDF",
+          "name": "sdfCapsule",
           "description": "a signed distance field for a capsule (cylinder with rounded caps).",
           "params": [
             {
@@ -962,10 +962,10 @@
             "description": "distance to the capsule surface."
           },
           "dependencies": [],
-          "wgslCode": "fn capsuleSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let d = abs(length(position.xz)) - radius;\n  let p = vec2<f32>(d, abs(position.y) - height * 0.5);\n  return length(max(p, vec2<f32>(0.0))) + min(max(p.x, p.y), 0.0) - radius;\n}"
+          "wgslCode": "fn sdfCapsule(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let d = abs(length(position.xz)) - radius;\n  let p = vec2<f32>(d, abs(position.y) - height * 0.5);\n  return length(max(p, vec2<f32>(0.0))) + min(max(p.x, p.y), 0.0) - radius;\n}"
         },
         {
-          "name": "coneSDF",
+          "name": "sdfCone",
           "description": "a signed distance field for a cone.",
           "params": [
             {
@@ -989,10 +989,10 @@
             "description": "distance to the cone surface."
           },
           "dependencies": [],
-          "wgslCode": "fn coneSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let q = vec2<f32>(length(position.xz), position.y);\n  let h = height;\n  let r = radius;\n  \n  // Calculate distance\n  let d1 = -q.y - h;\n  let d2 = max(q.x * h - q.y * r, q.y * h + q.x * r);\n  \n  return length(max(vec2<f32>(d1, d2), vec2<f32>(0.0))) + min(max(d1, d2), 0.0);\n}"
+          "wgslCode": "fn sdfCone(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let q = vec2<f32>(length(position.xz), position.y);\n  let h = height;\n  let r = radius;\n  \n  // Calculate distance\n  let d1 = -q.y - h;\n  let d2 = max(q.x * h - q.y * r, q.y * h + q.x * r);\n  \n  return length(max(vec2<f32>(d1, d2), vec2<f32>(0.0))) + min(max(d1, d2), 0.0);\n}"
         },
         {
-          "name": "cylinderSDF",
+          "name": "sdfCylinder",
           "description": "a signed distance field for a cylinder.",
           "params": [
             {
@@ -1016,10 +1016,10 @@
             "description": "distance to the cylinder surface."
           },
           "dependencies": [],
-          "wgslCode": "fn cylinderSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let d = vec2<f32>(length(position.xz), abs(position.y)) - vec2<f32>(radius, height * 0.5);\n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0)));\n}"
+          "wgslCode": "fn sdfCylinder(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  let d = vec2<f32>(length(position.xz), abs(position.y)) - vec2<f32>(radius, height * 0.5);\n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0)));\n}"
         },
         {
-          "name": "ellipsoidSDF",
+          "name": "sdfEllipsoid",
           "description": "a signed distance field for an ellipsoid.",
           "params": [
             {
@@ -1038,10 +1038,10 @@
             "description": "distance to the ellipsoid surface."
           },
           "dependencies": [],
-          "wgslCode": "fn ellipsoidSDF(position: vec3<f32>, radius: vec3<f32>) -> f32 {\n  let k0 = length(position / radius);\n  let k1 = length(position / (radius * radius));\n  return k0 * (k0 - 1.0) / k1;\n}"
+          "wgslCode": "fn sdfEllipsoid(position: vec3<f32>, radius: vec3<f32>) -> f32 {\n  let k0 = length(position / radius);\n  let k1 = length(position / (radius * radius));\n  return k0 * (k0 - 1.0) / k1;\n}"
         },
         {
-          "name": "gyroidSDF",
+          "name": "sdfGyroid",
           "description": "a signed distance field for a gyroid surface.",
           "params": [
             {
@@ -1065,10 +1065,10 @@
             "description": "distance to the gyroid surface."
           },
           "dependencies": [],
-          "wgslCode": "fn gyroidSDF(position: vec3<f32>, scale: f32, thickness: f32) -> f32 {\n  let p = position * scale;\n  return (abs(dot(sin(p), cos(p.zxy))) - thickness) / scale;\n}"
+          "wgslCode": "fn sdfGyroid(position: vec3<f32>, scale: f32, thickness: f32) -> f32 {\n  let p = position * scale;\n  return (abs(dot(sin(p), cos(p.zxy))) - thickness) / scale;\n}"
         },
         {
-          "name": "hexagonalPrismSDF",
+          "name": "sdfHexagonalPrism",
           "description": "a signed distance field for a hexagonal prism.",
           "params": [
             {
@@ -1092,10 +1092,10 @@
             "description": "distance to the hexagonal prism surface."
           },
           "dependencies": [],
-          "wgslCode": "fn hexagonalPrismSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  // Project into 2D\n  var p = abs(position);\n  let k = vec3<f32>(-0.866025404, 0.5, 0.577350269);\n  \n  // Hexagon in xy-plane\n  p = vec3<f32>(p.x + p.y * k.x, p.y * k.y, p.z);\n  p = vec3<f32>(p.x - min(p.x, p.y), p.y, p.z);\n  let d = vec2<f32>(length(vec2<f32>(p.x, p.y - radius * k.z)) - radius, abs(p.z) - height * 0.5);\n  \n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0)));\n}"
+          "wgslCode": "fn sdfHexagonalPrism(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  // Project into 2D\n  var p = abs(position);\n  let k = vec3<f32>(-0.866025404, 0.5, 0.577350269);\n  \n  // Hexagon in xy-plane\n  p = vec3<f32>(p.x + p.y * k.x, p.y * k.y, p.z);\n  p = vec3<f32>(p.x - min(p.x, p.y), p.y, p.z);\n  let d = vec2<f32>(length(vec2<f32>(p.x, p.y - radius * k.z)) - radius, abs(p.z) - height * 0.5);\n  \n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0)));\n}"
         },
         {
-          "name": "icosahedronSDF",
+          "name": "sdfIcosahedron",
           "description": "a signed distance field for an icosahedron.",
           "params": [
             {
@@ -1114,10 +1114,10 @@
             "description": "distance to the icosahedron surface."
           },
           "dependencies": [],
-          "wgslCode": "fn icosahedronSDF(position: vec3<f32>, size: f32) -> f32 {\n  var p = position;\n  let s = size;\n  \n  // Constants for icosahedron\n  let phi = 1.618033988749895;\n  let a = s;\n  let b = s * phi;\n  \n  // Compute distance to icosahedron\n  p = abs(p / s);\n  let d = p.x * p.y * p.z;\n  let m = max(max(p.x, p.y), p.z);\n  let n = min(min(p.x, p.y), p.z);\n  let mid = p.x + p.y + p.z - m - n;\n  \n  // Calculate the signed distance\n  let q = select(mid, d, m < phi * n);\n  return (length(p) - phi) * s;\n}"
+          "wgslCode": "fn sdfIcosahedron(position: vec3<f32>, size: f32) -> f32 {\n  var p = position;\n  let s = size;\n  \n  // Constants for icosahedron\n  let phi = 1.618033988749895;\n  let a = s;\n  let b = s * phi;\n  \n  // Compute distance to icosahedron\n  p = abs(p / s);\n  let d = p.x * p.y * p.z;\n  let m = max(max(p.x, p.y), p.z);\n  let n = min(min(p.x, p.y), p.z);\n  let mid = p.x + p.y + p.z - m - n;\n  \n  // Calculate the signed distance\n  let q = select(mid, d, m < phi * n);\n  return (length(p) - phi) * s;\n}"
         },
         {
-          "name": "juliaSDF",
+          "name": "sdfJulia",
           "description": "a signed distance field for a 4D Julia set fractal.",
           "params": [
             {
@@ -1146,10 +1146,10 @@
             "description": "distance to the Julia set surface."
           },
           "dependencies": [],
-          "wgslCode": "fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {\n  var z = vec4<f32>(position, 0.0);\n  var dz = vec4<f32>(1.0, 0.0, 0.0, 0.0);\n  var m = dot(z, z);\n  var i = 0;\n  \n  // Julia set iteration\n  for (i = 0; i < i32(iterations) && m < bailout * bailout; i += 1) {\n    // Quaternion multiplication for dz = 2.0 * z * dz\n    dz = 2.0 * vec4<f32>(\n      z.x * dz.x - z.y * dz.y - z.z * dz.z - z.w * dz.w,\n      z.x * dz.y + z.y * dz.x + z.z * dz.w - z.w * dz.z,\n      z.x * dz.z - z.y * dz.w + z.z * dz.x + z.w * dz.y,\n      z.x * dz.w + z.y * dz.z - z.z * dz.y + z.w * dz.x\n    );\n    \n    // Quaternion multiplication for z = z * z + c\n    z = vec4<f32>(\n      z.x * z.x - z.y * z.y - z.z * z.z - z.w * z.w,\n      z.x * z.y + z.y * z.x + z.z * z.w - z.w * z.z,\n      z.x * z.z - z.y * z.w + z.z * z.x + z.w * z.y,\n      z.x * z.w + z.y * z.z - z.z * z.y + z.w * z.x\n    ) + c;\n    \n    m = dot(z, z);\n  }\n  \n  // Compute the distance\n  let dist = 0.5 * log(m) * sqrt(m) / length(dz);\n  return dist;\n}"
+          "wgslCode": "fn sdfJulia(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {\n  var z = vec4<f32>(position, 0.0);\n  var dz = vec4<f32>(1.0, 0.0, 0.0, 0.0);\n  var m = dot(z, z);\n  var i = 0;\n  \n  // Julia set iteration\n  for (i = 0; i < i32(iterations) && m < bailout * bailout; i += 1) {\n    // Quaternion multiplication for dz = 2.0 * z * dz\n    dz = 2.0 * vec4<f32>(\n      z.x * dz.x - z.y * dz.y - z.z * dz.z - z.w * dz.w,\n      z.x * dz.y + z.y * dz.x + z.z * dz.w - z.w * dz.z,\n      z.x * dz.z - z.y * dz.w + z.z * dz.x + z.w * dz.y,\n      z.x * dz.w + z.y * dz.z - z.z * dz.y + z.w * dz.x\n    );\n    \n    // Quaternion multiplication for z = z * z + c\n    z = vec4<f32>(\n      z.x * z.x - z.y * z.y - z.z * z.z - z.w * z.w,\n      z.x * z.y + z.y * z.x + z.z * z.w - z.w * z.z,\n      z.x * z.z - z.y * z.w + z.z * z.x + z.w * z.y,\n      z.x * z.w + z.y * z.z - z.z * z.y + z.w * z.x\n    ) + c;\n    \n    m = dot(z, z);\n  }\n  \n  // Compute the distance\n  let dist = 0.5 * log(m) * sqrt(m) / length(dz);\n  return dist;\n}"
         },
         {
-          "name": "octahedronSDF",
+          "name": "sdfOctahedron",
           "description": "a signed distance field for an octahedron.",
           "params": [
             {
@@ -1168,10 +1168,10 @@
             "description": "distance to the octahedron surface."
           },
           "dependencies": [],
-          "wgslCode": "fn octahedronSDF(position: vec3<f32>, size: f32) -> f32 {\n  let p = abs(position);\n  let m = p.x + p.y + p.z - size;\n  \n  // Calculate the distance\n  var q: vec3<f32>;\n  if (3.0 * p.x < m) {\n    q = p;\n  } else if (3.0 * p.y < m) {\n    q = vec3<f32>(p.x, p.z, p.y);\n  } else if (3.0 * p.z < m) {\n    q = vec3<f32>(p.x, p.y, p.z);\n  } else {\n    q = p;\n  }\n  \n  let k = clamp(0.5 * (q.z - q.y + size), 0.0, size);\n  return length(vec3<f32>(q.x, q.y - size + k, q.z - k));\n}"
+          "wgslCode": "fn sdfOctahedron(position: vec3<f32>, size: f32) -> f32 {\n  let p = abs(position);\n  let m = p.x + p.y + p.z - size;\n  \n  // Calculate the distance\n  var q: vec3<f32>;\n  if (3.0 * p.x < m) {\n    q = p;\n  } else if (3.0 * p.y < m) {\n    q = vec3<f32>(p.x, p.z, p.y);\n  } else if (3.0 * p.z < m) {\n    q = vec3<f32>(p.x, p.y, p.z);\n  } else {\n    q = p;\n  }\n  \n  let k = clamp(0.5 * (q.z - q.y + size), 0.0, size);\n  return length(vec3<f32>(q.x, q.y - size + k, q.z - k));\n}"
         },
         {
-          "name": "planeSDF",
+          "name": "sdfPlane",
           "description": "a signed distance field for an infinite plane.",
           "params": [
             {
@@ -1190,10 +1190,10 @@
             "description": "distance to the plane surface."
           },
           "dependencies": [],
-          "wgslCode": "fn planeSDF(position: vec3<f32>, normal: vec3<f32>) -> f32 {\n  let n = normalize(normal);\n  return dot(position, n);\n}"
+          "wgslCode": "fn sdfPlane(position: vec3<f32>, normal: vec3<f32>) -> f32 {\n  let n = normalize(normal);\n  return dot(position, n);\n}"
         },
         {
-          "name": "pyramidSDF",
+          "name": "sdfPyramid",
           "description": "a signed distance field for a pyramid.",
           "params": [
             {
@@ -1217,10 +1217,10 @@
             "description": "distance to the pyramid surface."
           },
           "dependencies": [],
-          "wgslCode": "fn pyramidSDF(position: vec3<f32>, size: f32, height: f32) -> f32 {\n  // Normalize position\n  var p = position;\n  let h = height;\n  let m2 = h * h + size * size;\n  \n  // Project into 2D\n  let q = abs(p);\n  p.y -= h;\n  p.y = max(p.y, 0.0);\n  \n  // Distance calculation\n  var d: f32;\n  if (max(q.x, q.z) < size) {\n    d = length(vec2<f32>(length(p.xz), p.y)) - sqrt(m2);\n  } else {\n    d = length(vec2<f32>(length(max(abs(p.xz) - vec2<f32>(size), vec2<f32>(0.0))), p.y));\n  }\n  \n  // Account for position below base\n  d = select(d, length(p) - sqrt(m2), p.y < 0.0);\n  \n  return d;\n}"
+          "wgslCode": "fn sdfPyramid(position: vec3<f32>, size: f32, height: f32) -> f32 {\n  // Normalize position\n  var p = position;\n  let h = height;\n  let m2 = h * h + size * size;\n  \n  // Project into 2D\n  let q = abs(p);\n  p.y -= h;\n  p.y = max(p.y, 0.0);\n  \n  // Distance calculation\n  var d: f32;\n  if (max(q.x, q.z) < size) {\n    d = length(vec2<f32>(length(p.xz), p.y)) - sqrt(m2);\n  } else {\n    d = length(vec2<f32>(length(max(abs(p.xz) - vec2<f32>(size), vec2<f32>(0.0))), p.y));\n  }\n  \n  // Account for position below base\n  d = select(d, length(p) - sqrt(m2), p.y < 0.0);\n  \n  return d;\n}"
         },
         {
-          "name": "rhombusSDF",
+          "name": "sdfRhombus",
           "description": "a signed distance field for a rhombus.",
           "params": [
             {
@@ -1244,10 +1244,10 @@
             "description": "distance to the rhombus surface."
           },
           "dependencies": [],
-          "wgslCode": "fn rhombusSDF(position: vec3<f32>, dimensions: vec3<f32>, sharpness: f32) -> f32 {\n  var p = abs(position);\n  let b = dimensions;\n  let e = sharpness;\n  \n  // Calculate distance to rhombus\n  p = p - b;\n  let q = abs(p.x + p.y + p.z) + e;\n  let h = max(vec3<f32>(q) - vec3<f32>(e), vec3<f32>(0.0));\n  \n  return min(max(p.x, max(p.y, p.z)), 0.0) + length(h);\n}"
+          "wgslCode": "fn sdfRhombus(position: vec3<f32>, dimensions: vec3<f32>, sharpness: f32) -> f32 {\n  var p = abs(position);\n  let b = dimensions;\n  let e = sharpness;\n  \n  // Calculate distance to rhombus\n  p = p - b;\n  let q = abs(p.x + p.y + p.z) + e;\n  let h = max(vec3<f32>(q) - vec3<f32>(e), vec3<f32>(0.0));\n  \n  return min(max(p.x, max(p.y, p.z)), 0.0) + length(h);\n}"
         },
         {
-          "name": "roundBoxSDF",
+          "name": "sdfRoundBox",
           "description": "a signed distance field for a rounded box.",
           "params": [
             {
@@ -1271,10 +1271,10 @@
             "description": "distance to the rounded box surface."
           },
           "dependencies": [],
-          "wgslCode": "fn roundBoxSDF(position: vec3<f32>, size: vec3<f32>, radius: f32) -> f32 {\n  let q = abs(position) - size;\n  return length(max(q, vec3<f32>(0.0))) + \n         min(max(q.x, max(q.y, q.z)), 0.0) - \n         radius;\n}"
+          "wgslCode": "fn sdfRoundBox(position: vec3<f32>, size: vec3<f32>, radius: f32) -> f32 {\n  let q = abs(position) - size;\n  return length(max(q, vec3<f32>(0.0))) + \n         min(max(q.x, max(q.y, q.z)), 0.0) - \n         radius;\n}"
         },
         {
-          "name": "roundedConeSDF",
+          "name": "sdfRoundedCone",
           "description": "a signed distance field for a rounded cone.",
           "params": [
             {
@@ -1308,10 +1308,10 @@
             "description": "distance to the rounded cone surface."
           },
           "dependencies": [],
-          "wgslCode": "fn roundedConeSDF(position: vec3<f32>, radius1: f32, radius2: f32, height: f32, roundness: f32) -> f32 {\n  // Calculate distances\n  let p = position;\n  let r1 = radius1 - roundness;\n  let r2 = radius2 - roundness;\n  let h = height;\n  \n  // Squared distance from axis\n  let q = length(p.xz);\n  \n  // Project into 2D space\n  let k1 = (r2 - r1) / h;\n  let k2 = h / (r1 - r2);\n  let projected = vec2<f32>(q - r1 + r1 * (p.y / h) * (r1 - r2) / r1, p.y - h);\n  let ca = p.y * k1 - q;\n  let cb = p.y - r1 * k2 + q * k2;\n  \n  var s: f32;\n  if (ca < 0.0 && projected.y < 0.0) {\n    s = length(projected) - roundness;\n  } else if (ca > 0.0 && cb < 0.0) {\n    s = -ca - roundness;\n  } else {\n    s = length(vec2<f32>(max(ca, 0.0), max(projected.y, 0.0))) - roundness;\n  }\n  \n  return s;\n}"
+          "wgslCode": "fn sdfRoundedCone(position: vec3<f32>, radius1: f32, radius2: f32, height: f32, roundness: f32) -> f32 {\n  // Calculate distances\n  let p = position;\n  let r1 = radius1 - roundness;\n  let r2 = radius2 - roundness;\n  let h = height;\n  \n  // Squared distance from axis\n  let q = length(p.xz);\n  \n  // Project into 2D space\n  let k1 = (r2 - r1) / h;\n  let k2 = h / (r1 - r2);\n  let projected = vec2<f32>(q - r1 + r1 * (p.y / h) * (r1 - r2) / r1, p.y - h);\n  let ca = p.y * k1 - q;\n  let cb = p.y - r1 * k2 + q * k2;\n  \n  var s: f32;\n  if (ca < 0.0 && projected.y < 0.0) {\n    s = length(projected) - roundness;\n  } else if (ca > 0.0 && cb < 0.0) {\n    s = -ca - roundness;\n  } else {\n    s = length(vec2<f32>(max(ca, 0.0), max(projected.y, 0.0))) - roundness;\n  }\n  \n  return s;\n}"
         },
         {
-          "name": "roundedCylinderSDF",
+          "name": "sdfRoundedCylinder",
           "description": "a signed distance field for a rounded cylinder.",
           "params": [
             {
@@ -1340,10 +1340,10 @@
             "description": "distance to the rounded cylinder surface."
           },
           "dependencies": [],
-          "wgslCode": "fn roundedCylinderSDF(position: vec3<f32>, radius: f32, height: f32, roundness: f32) -> f32 {\n  // Calculate distances\n  let radiusOffset = radius - roundness;\n  let heightOffset = height * 0.5 - roundness;\n  \n  // Generate rounded cylinder\n  let d = vec2<f32>(length(position.xz) - radiusOffset, abs(position.y) - heightOffset);\n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0))) - roundness;\n}"
+          "wgslCode": "fn sdfRoundedCylinder(position: vec3<f32>, radius: f32, height: f32, roundness: f32) -> f32 {\n  // Calculate distances\n  let radiusOffset = radius - roundness;\n  let heightOffset = height * 0.5 - roundness;\n  \n  // Generate rounded cylinder\n  let d = vec2<f32>(length(position.xz) - radiusOffset, abs(position.y) - heightOffset);\n  return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0))) - roundness;\n}"
         },
         {
-          "name": "sphereSDF",
+          "name": "sdfSphere",
           "description": "a signed distance field for a sphere.",
           "params": [
             {
@@ -1362,10 +1362,10 @@
             "description": "distance to the sphere surface."
           },
           "dependencies": [],
-          "wgslCode": "fn sphereSDF(position: vec3<f32>, radius: f32) -> f32 {\n  return length(position) - radius;\n}"
+          "wgslCode": "fn sdfSphere(position: vec3<f32>, radius: f32) -> f32 {\n  return length(position) - radius;\n}"
         },
         {
-          "name": "tetrahedronSDF",
+          "name": "sdfTetrahedron",
           "description": "a signed distance field for a tetrahedron.",
           "params": [
             {
@@ -1384,10 +1384,10 @@
             "description": "distance to the tetrahedron surface."
           },
           "dependencies": [],
-          "wgslCode": "fn tetrahedronSDF(position: vec3<f32>, size: f32) -> f32 {\n  var p = position;\n  let s = size;\n  \n  // Set initial values\n  let signVal = sign(p.x + p.y + p.z);\n  p.x = abs(p.x);\n  p.y = abs(p.y);\n  p.z = abs(p.z);\n  \n  // Calculate the distance\n  if (p.x < p.y) {\n    let t = p.x;\n    p.x = p.y;\n    p.y = t;\n  }\n  if (p.x < p.z) {\n    let t = p.x;\n    p.x = p.z;\n    p.z = t;\n  }\n  if (p.y < p.z) {\n    let t = p.y;\n    p.y = p.z;\n    p.z = t;\n  }\n  \n  let k = clamp((p.x + p.z - p.y) * 0.5, 0.0, p.z);\n  return signVal * (length(vec3<f32>(p.x, p.y - s, p.z - k)) - s);\n}"
+          "wgslCode": "fn sdfTetrahedron(position: vec3<f32>, size: f32) -> f32 {\n  var p = position;\n  let s = size;\n  \n  // Set initial values\n  let signVal = sign(p.x + p.y + p.z);\n  p.x = abs(p.x);\n  p.y = abs(p.y);\n  p.z = abs(p.z);\n  \n  // Calculate the distance\n  if (p.x < p.y) {\n    let t = p.x;\n    p.x = p.y;\n    p.y = t;\n  }\n  if (p.x < p.z) {\n    let t = p.x;\n    p.x = p.z;\n    p.z = t;\n  }\n  if (p.y < p.z) {\n    let t = p.y;\n    p.y = p.z;\n    p.z = t;\n  }\n  \n  let k = clamp((p.x + p.z - p.y) * 0.5, 0.0, p.z);\n  return signVal * (length(vec3<f32>(p.x, p.y - s, p.z - k)) - s);\n}"
         },
         {
-          "name": "torusSDF",
+          "name": "sdfTorus",
           "description": "a signed distance field for a torus.",
           "params": [
             {
@@ -1411,10 +1411,10 @@
             "description": "distance to the torus surface."
           },
           "dependencies": [],
-          "wgslCode": "fn torusSDF(position: vec3<f32>, majorRadius: f32, minorRadius: f32) -> f32 {\n  let q = vec2<f32>(length(position.xz) - majorRadius, position.y);\n  return length(q) - minorRadius;\n}"
+          "wgslCode": "fn sdfTorus(position: vec3<f32>, majorRadius: f32, minorRadius: f32) -> f32 {\n  let q = vec2<f32>(length(position.xz) - majorRadius, position.y);\n  return length(q) - minorRadius;\n}"
         },
         {
-          "name": "triangularPrismSDF",
+          "name": "sdfTriangularPrism",
           "description": "a signed distance field for a triangular prism.",
           "params": [
             {
@@ -1438,7 +1438,7 @@
             "description": "distance to the triangular prism surface."
           },
           "dependencies": [],
-          "wgslCode": "fn triangularPrismSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  var q = abs(position);\n  \n  // Triangle distance in xy-plane\n  let k = sqrt(3.0);\n  q.x = abs(q.x - q.y * k * 0.5);\n  q.y = q.y * 0.866025404 + q.x * 0.5;\n  \n  // Combine with z distance\n  let d1 = vec2<f32>(q.x - radius, q.y);\n  let d2 = vec2<f32>(q.y - radius, q.x);\n  let d = min(d1, d2);\n  \n  // Account for height\n  let h = height * 0.5;\n  let dz = q.z - h;\n  let dz2 = max(dz, 0.0);\n  \n  return length(max(vec2<f32>(max(d.x, 0.0), dz2), vec2<f32>(0.0))) + min(max(d.x, dz), 0.0);\n}"
+          "wgslCode": "fn sdfTriangularPrism(position: vec3<f32>, radius: f32, height: f32) -> f32 {\n  var q = abs(position);\n  \n  // Triangle distance in xy-plane\n  let k = sqrt(3.0);\n  q.x = abs(q.x - q.y * k * 0.5);\n  q.y = q.y * 0.866025404 + q.x * 0.5;\n  \n  // Combine with z distance\n  let d1 = vec2<f32>(q.x - radius, q.y);\n  let d2 = vec2<f32>(q.y - radius, q.x);\n  let d = min(d1, d2);\n  \n  // Account for height\n  let h = height * 0.5;\n  let dz = q.z - h;\n  let dz2 = max(dz, 0.0);\n  \n  return length(max(vec2<f32>(max(d.x, 0.0), dz2), vec2<f32>(0.0))) + min(max(d.x, dz), 0.0);\n}"
         }
       ]
     },
@@ -1519,7 +1519,7 @@
           "wgslCode": "fn srgbToLinear(color: vec3<f32>) -> vec3<f32> {\n  return pow(color, vec3(2.2));\n}"
         },
         {
-          "name": "hue2rgb",
+          "name": "hueToRgb",
           "description": "function for HSL to RGB conversion - converts hue component to RGB.",
           "params": [
             {
@@ -1543,7 +1543,7 @@
             "description": "component value."
           },
           "dependencies": [],
-          "wgslCode": "fn hue2rgb(p: f32, q: f32, t: f32) -> f32 {\n  var t_adj = t;\n  if (t_adj < 0.0) { t_adj += 1.0; }\n  if (t_adj > 1.0) { t_adj -= 1.0; }\n  if (t_adj < 1.0 / 6.0) { return p + (q - p) * 6.0 * t_adj; }\n  if (t_adj < 1.0 / 2.0) { return q; }\n  if (t_adj < 2.0 / 3.0) { return p + (q - p) * (2.0 / 3.0 - t_adj) * 6.0; }\n  return p;\n}"
+          "wgslCode": "fn hueToRgb(p: f32, q: f32, t: f32) -> f32 {\n  var t_adj = t;\n  if (t_adj < 0.0) { t_adj += 1.0; }\n  if (t_adj > 1.0) { t_adj -= 1.0; }\n  if (t_adj < 1.0 / 6.0) { return p + (q - p) * 6.0 * t_adj; }\n  if (t_adj < 1.0 / 2.0) { return q; }\n  if (t_adj < 2.0 / 3.0) { return p + (q - p) * (2.0 / 3.0 - t_adj) * 6.0; }\n  return p;\n}"
         },
         {
           "name": "hslToRgb",
@@ -1560,9 +1560,9 @@
             "description": "color values."
           },
           "dependencies": [
-            "hue2rgb"
+            "hueToRgb"
           ],
-          "wgslCode": "//! requires hue2rgb\nfn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hue2rgb(p, q, h + 1.0 / 3.0),\n    hue2rgb(p, q, h),\n    hue2rgb(p, q, h - 1.0 / 3.0)\n  );\n}"
+          "wgslCode": "//! requires hueToRgb\nfn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {\n  let h = hsl.x;\n  let s = hsl.y;\n  let l = hsl.z;\n  \n  if (s == 0.0) {\n    return vec3(l); // achromatic\n  }\n  \n  let q = select(l * (1.0 + s), l + s - l * s, l < 0.5);\n  let p = 2.0 * l - q;\n  \n  return vec3(\n    hueToRgb(p, q, h + 1.0 / 3.0),\n    hueToRgb(p, q, h),\n    hueToRgb(p, q, h - 1.0 / 3.0)\n  );\n}"
         }
       ]
     },

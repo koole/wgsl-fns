@@ -39,14 +39,14 @@ export const srgbToLinear = `fn srgbToLinear(color: vec3<f32>) -> vec3<f32> {
 
 /**
  * @wgsl
- * @name hue2rgb
+ * @name hueToRgb
  * @description Helper function for HSL to RGB conversion - converts hue component to RGB.
  * @param {f32} p First HSL conversion parameter.
  * @param {f32} q Second HSL conversion parameter.
  * @param {f32} t Hue value (adjusted).
  * @returns {f32} RGB component value.
  */
-export const hue2rgb = `fn hue2rgb(p: f32, q: f32, t: f32) -> f32 {
+export const hueToRgb = `fn hueToRgb(p: f32, q: f32, t: f32) -> f32 {
   var t_adj = t;
   if (t_adj < 0.0) { t_adj += 1.0; }
   if (t_adj > 1.0) { t_adj -= 1.0; }
@@ -62,9 +62,9 @@ export const hue2rgb = `fn hue2rgb(p: f32, q: f32, t: f32) -> f32 {
  * @description Converts HSL (Hue, Saturation, Lightness) color to RGB.
  * @param {vec3<f32>} hsl HSL color values (hue: 0-1, saturation: 0-1, lightness: 0-1).
  * @returns {vec3<f32>} RGB color values.
- * @requires hue2rgb
+ * @requires hueToRgb
  */
-export const hslToRgb = `//! requires hue2rgb
+export const hslToRgb = `//! requires hueToRgb
 fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {
   let h = hsl.x;
   let s = hsl.y;
@@ -78,8 +78,8 @@ fn hslToRgb(hsl: vec3<f32>) -> vec3<f32> {
   let p = 2.0 * l - q;
   
   return vec3(
-    hue2rgb(p, q, h + 1.0 / 3.0),
-    hue2rgb(p, q, h),
-    hue2rgb(p, q, h - 1.0 / 3.0)
+    hueToRgb(p, q, h + 1.0 / 3.0),
+    hueToRgb(p, q, h),
+    hueToRgb(p, q, h - 1.0 / 3.0)
   );
 }`;

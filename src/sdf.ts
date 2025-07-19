@@ -63,14 +63,14 @@ export const sdfSubtraction = `fn sdfSubtraction(d1: f32, d2: f32) -> f32 {
 
 /**
  * @wgsl
- * @name boxFrameSDF
+ * @name sdfBoxFrame
  * @description Generates a signed distance field for a 3D box frame (hollow box).
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec3<f32>} size Half-extents of the box.
  * @param {f32} thickness Wall thickness of the frame.
  * @returns {f32} Signed distance to the box frame surface.
  */
-export const boxFrameSDF = `fn boxFrameSDF(position: vec3<f32>, size: vec3<f32>, thickness: f32) -> f32 {
+export const sdfBoxFrame = `fn sdfBoxFrame(position: vec3<f32>, size: vec3<f32>, thickness: f32) -> f32 {
   let q = abs(position) - size;
   let w = abs(q + thickness) - thickness;
   return min(min(
@@ -81,7 +81,7 @@ export const boxFrameSDF = `fn boxFrameSDF(position: vec3<f32>, size: vec3<f32>,
 
 /**
  * @wgsl
- * @name cappedTorusSDF
+ * @name sdfCappedTorus
  * @description Generates a signed distance field for a capped torus.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} majorRadius Major radius of the torus.
@@ -89,7 +89,7 @@ export const boxFrameSDF = `fn boxFrameSDF(position: vec3<f32>, size: vec3<f32>,
  * @param {f32} angle Cap angle in radians.
  * @returns {f32} Signed distance to the capped torus surface.
  */
-export const cappedTorusSDF = `fn cappedTorusSDF(position: vec3<f32>, majorRadius: f32, minorRadius: f32, angle: f32) -> f32 {
+export const sdfCappedTorus = `fn sdfCappedTorus(position: vec3<f32>, majorRadius: f32, minorRadius: f32, angle: f32) -> f32 {
   let sc = vec2<f32>(sin(angle), cos(angle));
   let q = vec3<f32>(abs(position.x), position.y, position.z);
   let k = select(
@@ -105,14 +105,14 @@ export const cappedTorusSDF = `fn cappedTorusSDF(position: vec3<f32>, majorRadiu
 
 /**
  * @wgsl
- * @name capsuleSDF
+ * @name sdfCapsule
  * @description Generates a signed distance field for a capsule (cylinder with rounded caps).
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the capsule.
  * @param {f32} height Height of the cylindrical portion.
  * @returns {f32} Signed distance to the capsule surface.
  */
-export const capsuleSDF = `fn capsuleSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {
+export const sdfCapsule = `fn sdfCapsule(position: vec3<f32>, radius: f32, height: f32) -> f32 {
   let d = abs(length(position.xz)) - radius;
   let p = vec2<f32>(d, abs(position.y) - height * 0.5);
   return length(max(p, vec2<f32>(0.0))) + min(max(p.x, p.y), 0.0) - radius;
@@ -120,14 +120,14 @@ export const capsuleSDF = `fn capsuleSDF(position: vec3<f32>, radius: f32, heigh
 
 /**
  * @wgsl
- * @name coneSDF
+ * @name sdfCone
  * @description Generates a signed distance field for a cone.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Base radius of the cone.
  * @param {f32} height Height of the cone.
  * @returns {f32} Signed distance to the cone surface.
  */
-export const coneSDF = `fn coneSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {
+export const sdfCone = `fn sdfCone(position: vec3<f32>, radius: f32, height: f32) -> f32 {
   let q = vec2<f32>(length(position.xz), position.y);
   let h = height;
   let r = radius;
@@ -141,27 +141,27 @@ export const coneSDF = `fn coneSDF(position: vec3<f32>, radius: f32, height: f32
 
 /**
  * @wgsl
- * @name cylinderSDF
+ * @name sdfCylinder
  * @description Generates a signed distance field for a cylinder.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the cylinder.
  * @param {f32} height Height of the cylinder.
  * @returns {f32} Signed distance to the cylinder surface.
  */
-export const cylinderSDF = `fn cylinderSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {
+export const sdfCylinder = `fn sdfCylinder(position: vec3<f32>, radius: f32, height: f32) -> f32 {
   let d = vec2<f32>(length(position.xz), abs(position.y)) - vec2<f32>(radius, height * 0.5);
   return min(max(d.x, d.y), 0.0) + length(max(d, vec2<f32>(0.0)));
 }`;
 
 /**
  * @wgsl
- * @name ellipsoidSDF
+ * @name sdfEllipsoid
  * @description Generates a signed distance field for an ellipsoid.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec3<f32>} radius Radii along each axis.
  * @returns {f32} Signed distance to the ellipsoid surface.
  */
-export const ellipsoidSDF = `fn ellipsoidSDF(position: vec3<f32>, radius: vec3<f32>) -> f32 {
+export const sdfEllipsoid = `fn sdfEllipsoid(position: vec3<f32>, radius: vec3<f32>) -> f32 {
   let k0 = length(position / radius);
   let k1 = length(position / (radius * radius));
   return k0 * (k0 - 1.0) / k1;
@@ -169,28 +169,28 @@ export const ellipsoidSDF = `fn ellipsoidSDF(position: vec3<f32>, radius: vec3<f
 
 /**
  * @wgsl
- * @name gyroidSDF
+ * @name sdfGyroid
  * @description Generates a signed distance field for a gyroid surface.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} scale Scale factor for the gyroid pattern.
  * @param {f32} thickness Thickness of the gyroid surface.
  * @returns {f32} Signed distance to the gyroid surface.
  */
-export const gyroidSDF = `fn gyroidSDF(position: vec3<f32>, scale: f32, thickness: f32) -> f32 {
+export const sdfGyroid = `fn sdfGyroid(position: vec3<f32>, scale: f32, thickness: f32) -> f32 {
   let p = position * scale;
   return (abs(dot(sin(p), cos(p.zxy))) - thickness) / scale;
 }`;
 
 /**
  * @wgsl
- * @name hexagonalPrismSDF
+ * @name sdfHexagonalPrism
  * @description Generates a signed distance field for a hexagonal prism.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the hexagon.
  * @param {f32} height Height of the prism.
  * @returns {f32} Signed distance to the hexagonal prism surface.
  */
-export const hexagonalPrismSDF = `fn hexagonalPrismSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {
+export const sdfHexagonalPrism = `fn sdfHexagonalPrism(position: vec3<f32>, radius: f32, height: f32) -> f32 {
   // Project into 2D
   var p = abs(position);
   let k = vec3<f32>(-0.866025404, 0.5, 0.577350269);
@@ -205,13 +205,13 @@ export const hexagonalPrismSDF = `fn hexagonalPrismSDF(position: vec3<f32>, radi
 
 /**
  * @wgsl
- * @name icosahedronSDF
+ * @name sdfIcosahedron
  * @description Generates a signed distance field for an icosahedron.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} size Size of the icosahedron.
  * @returns {f32} Signed distance to the icosahedron surface.
  */
-export const icosahedronSDF = `fn icosahedronSDF(position: vec3<f32>, size: f32) -> f32 {
+export const sdfIcosahedron = `fn sdfIcosahedron(position: vec3<f32>, size: f32) -> f32 {
   var p = position;
   let s = size;
   
@@ -234,7 +234,7 @@ export const icosahedronSDF = `fn icosahedronSDF(position: vec3<f32>, size: f32)
 
 /**
  * @wgsl
- * @name juliaSDF
+ * @name sdfJulia
  * @description Generates a signed distance field for a 4D Julia set fractal.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec4<f32>} c Julia set parameter (quaternion).
@@ -242,7 +242,7 @@ export const icosahedronSDF = `fn icosahedronSDF(position: vec3<f32>, size: f32)
  * @param {f32} bailout Bailout radius for iteration escape.
  * @returns {f32} Signed distance to the Julia set surface.
  */
-export const juliaSDF = `fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {
+export const sdfJulia = `fn sdfJulia(position: vec3<f32>, c: vec4<f32>, iterations: f32, bailout: f32) -> f32 {
   var z = vec4<f32>(position, 0.0);
   var dz = vec4<f32>(1.0, 0.0, 0.0, 0.0);
   var m = dot(z, z);
@@ -276,13 +276,13 @@ export const juliaSDF = `fn juliaSDF(position: vec3<f32>, c: vec4<f32>, iteratio
 
 /**
  * @wgsl
- * @name octahedronSDF
+ * @name sdfOctahedron
  * @description Generates a signed distance field for an octahedron.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} size Size of the octahedron.
  * @returns {f32} Signed distance to the octahedron surface.
  */
-export const octahedronSDF = `fn octahedronSDF(position: vec3<f32>, size: f32) -> f32 {
+export const sdfOctahedron = `fn sdfOctahedron(position: vec3<f32>, size: f32) -> f32 {
   let p = abs(position);
   let m = p.x + p.y + p.z - size;
   
@@ -304,27 +304,27 @@ export const octahedronSDF = `fn octahedronSDF(position: vec3<f32>, size: f32) -
 
 /**
  * @wgsl
- * @name planeSDF
+ * @name sdfPlane
  * @description Generates a signed distance field for an infinite plane.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec3<f32>} normal Normal vector of the plane (should be normalized).
  * @returns {f32} Signed distance to the plane surface.
  */
-export const planeSDF = `fn planeSDF(position: vec3<f32>, normal: vec3<f32>) -> f32 {
+export const sdfPlane = `fn sdfPlane(position: vec3<f32>, normal: vec3<f32>) -> f32 {
   let n = normalize(normal);
   return dot(position, n);
 }`;
 
 /**
  * @wgsl
- * @name pyramidSDF
+ * @name sdfPyramid
  * @description Generates a signed distance field for a pyramid.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} size Base size of the pyramid.
  * @param {f32} height Height of the pyramid.
  * @returns {f32} Signed distance to the pyramid surface.
  */
-export const pyramidSDF = `fn pyramidSDF(position: vec3<f32>, size: f32, height: f32) -> f32 {
+export const sdfPyramid = `fn sdfPyramid(position: vec3<f32>, size: f32, height: f32) -> f32 {
   // Normalize position
   var p = position;
   let h = height;
@@ -351,14 +351,14 @@ export const pyramidSDF = `fn pyramidSDF(position: vec3<f32>, size: f32, height:
 
 /**
  * @wgsl
- * @name rhombusSDF
+ * @name sdfRhombus
  * @description Generates a signed distance field for a rhombus.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec3<f32>} dimensions Dimensions of the rhombus.
  * @param {f32} sharpness Sharpness factor for the edges.
  * @returns {f32} Signed distance to the rhombus surface.
  */
-export const rhombusSDF = `fn rhombusSDF(position: vec3<f32>, dimensions: vec3<f32>, sharpness: f32) -> f32 {
+export const sdfRhombus = `fn sdfRhombus(position: vec3<f32>, dimensions: vec3<f32>, sharpness: f32) -> f32 {
   var p = abs(position);
   let b = dimensions;
   let e = sharpness;
@@ -373,14 +373,14 @@ export const rhombusSDF = `fn rhombusSDF(position: vec3<f32>, dimensions: vec3<f
 
 /**
  * @wgsl
- * @name roundBoxSDF
+ * @name sdfRoundBox
  * @description Generates a signed distance field for a rounded box.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {vec3<f32>} size Half-extents of the box.
  * @param {f32} radius Rounding radius for the edges.
  * @returns {f32} Signed distance to the rounded box surface.
  */
-export const roundBoxSDF = `fn roundBoxSDF(position: vec3<f32>, size: vec3<f32>, radius: f32) -> f32 {
+export const sdfRoundBox = `fn sdfRoundBox(position: vec3<f32>, size: vec3<f32>, radius: f32) -> f32 {
   let q = abs(position) - size;
   return length(max(q, vec3<f32>(0.0))) + 
          min(max(q.x, max(q.y, q.z)), 0.0) - 
@@ -389,7 +389,7 @@ export const roundBoxSDF = `fn roundBoxSDF(position: vec3<f32>, size: vec3<f32>,
 
 /**
  * @wgsl
- * @name roundedConeSDF
+ * @name sdfRoundedCone
  * @description Generates a signed distance field for a rounded cone.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius1 Bottom radius of the cone.
@@ -398,7 +398,7 @@ export const roundBoxSDF = `fn roundBoxSDF(position: vec3<f32>, size: vec3<f32>,
  * @param {f32} roundness Rounding factor for the edges.
  * @returns {f32} Signed distance to the rounded cone surface.
  */
-export const roundedConeSDF = `fn roundedConeSDF(position: vec3<f32>, radius1: f32, radius2: f32, height: f32, roundness: f32) -> f32 {
+export const sdfRoundedCone = `fn sdfRoundedCone(position: vec3<f32>, radius1: f32, radius2: f32, height: f32, roundness: f32) -> f32 {
   // Calculate distances
   let p = position;
   let r1 = radius1 - roundness;
@@ -429,7 +429,7 @@ export const roundedConeSDF = `fn roundedConeSDF(position: vec3<f32>, radius1: f
 
 /**
  * @wgsl
- * @name roundedCylinderSDF
+ * @name sdfRoundedCylinder
  * @description Generates a signed distance field for a rounded cylinder.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the cylinder.
@@ -437,7 +437,7 @@ export const roundedConeSDF = `fn roundedConeSDF(position: vec3<f32>, radius1: f
  * @param {f32} roundness Rounding factor for the edges.
  * @returns {f32} Signed distance to the rounded cylinder surface.
  */
-export const roundedCylinderSDF = `fn roundedCylinderSDF(position: vec3<f32>, radius: f32, height: f32, roundness: f32) -> f32 {
+export const sdfRoundedCylinder = `fn sdfRoundedCylinder(position: vec3<f32>, radius: f32, height: f32, roundness: f32) -> f32 {
   // Calculate distances
   let radiusOffset = radius - roundness;
   let heightOffset = height * 0.5 - roundness;
@@ -449,25 +449,25 @@ export const roundedCylinderSDF = `fn roundedCylinderSDF(position: vec3<f32>, ra
 
 /**
  * @wgsl
- * @name sphereSDF
+ * @name sdfSphere
  * @description Generates a signed distance field for a sphere.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the sphere.
  * @returns {f32} Signed distance to the sphere surface.
  */
-export const sphereSDF = `fn sphereSDF(position: vec3<f32>, radius: f32) -> f32 {
+export const sdfSphere = `fn sdfSphere(position: vec3<f32>, radius: f32) -> f32 {
   return length(position) - radius;
 }`;
 
 /**
  * @wgsl
- * @name tetrahedronSDF
+ * @name sdfTetrahedron
  * @description Generates a signed distance field for a tetrahedron.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} size Size of the tetrahedron.
  * @returns {f32} Signed distance to the tetrahedron surface.
  */
-export const tetrahedronSDF = `fn tetrahedronSDF(position: vec3<f32>, size: f32) -> f32 {
+export const sdfTetrahedron = `fn sdfTetrahedron(position: vec3<f32>, size: f32) -> f32 {
   var p = position;
   let s = size;
   
@@ -500,28 +500,28 @@ export const tetrahedronSDF = `fn tetrahedronSDF(position: vec3<f32>, size: f32)
 
 /**
  * @wgsl
- * @name torusSDF
+ * @name sdfTorus
  * @description Generates a signed distance field for a torus.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} majorRadius Major radius of the torus.
  * @param {f32} minorRadius Minor radius of the torus.
  * @returns {f32} Signed distance to the torus surface.
  */
-export const torusSDF = `fn torusSDF(position: vec3<f32>, majorRadius: f32, minorRadius: f32) -> f32 {
+export const sdfTorus = `fn sdfTorus(position: vec3<f32>, majorRadius: f32, minorRadius: f32) -> f32 {
   let q = vec2<f32>(length(position.xz) - majorRadius, position.y);
   return length(q) - minorRadius;
 }`;
 
 /**
  * @wgsl
- * @name triangularPrismSDF
+ * @name sdfTriangularPrism
  * @description Generates a signed distance field for a triangular prism.
  * @param {vec3<f32>} position 3D position to evaluate.
  * @param {f32} radius Radius of the triangular base.
  * @param {f32} height Height of the prism.
  * @returns {f32} Signed distance to the triangular prism surface.
  */
-export const triangularPrismSDF = `fn triangularPrismSDF(position: vec3<f32>, radius: f32, height: f32) -> f32 {
+export const sdfTriangularPrism = `fn sdfTriangularPrism(position: vec3<f32>, radius: f32, height: f32) -> f32 {
   var q = abs(position);
   
   // Triangle distance in xy-plane

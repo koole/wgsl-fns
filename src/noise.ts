@@ -247,14 +247,14 @@ export const xxhash32 = `fn xxhash32(n: u32) -> u32 {
 
 /**
  * @wgsl
- * @name xxhash32_2d
+ * @name xxhash322d
  * @description 2D xxHash for strong integer hashing in 2D.
  * @param {vec2<u32>} p Input 2D unsigned integer vector to hash.
  * @returns {u32} Hashed unsigned integer value.
  */
 // https://github.com/Cyan4973/xxHash
 // https://www.shadertoy.com/view/Xt3cDn
-export const xxhash32_2d = `fn xxhash32_2d(p: vec2u) -> u32 {
+export const xxhash322d = `fn xxhash322d(p: vec2u) -> u32 {
     let p2 = 2246822519u; let p3 = 3266489917u;
     let p4 = 668265263u; let p5 = 374761393u;
     var h32 = p.y + p5 + p.x * p3;
@@ -266,14 +266,14 @@ export const xxhash32_2d = `fn xxhash32_2d(p: vec2u) -> u32 {
 
 /**
  * @wgsl
- * @name xxhash32_3d
+ * @name xxhash323d
  * @description 3D xxHash for strong integer hashing in 3D.
  * @param {vec3<u32>} p Input 3D unsigned integer vector to hash.
  * @returns {u32} Hashed unsigned integer value.
  */
 // https://github.com/Cyan4973/xxHash
 // https://www.shadertoy.com/view/Xt3cDn
-export const xxhash32_3d = `fn xxhash32_3d(p: vec3u) -> u32 {
+export const xxhash323d = `fn xxhash323d(p: vec3u) -> u32 {
     let p2 = 2246822519u; let p3 = 3266489917u;
     let p4 = 668265263u; let p5 = 374761393u;
     var h32 =  p.z + p5 + p.x*p3;
@@ -287,14 +287,14 @@ export const xxhash32_3d = `fn xxhash32_3d(p: vec3u) -> u32 {
 
 /**
  * @wgsl
- * @name xxhash32_4d
+ * @name xxhash324d
  * @description 4D xxHash for strong integer hashing in 4D.
  * @param {vec4<u32>} p Input 4D unsigned integer vector to hash.
  * @returns {u32} Hashed unsigned integer value.
  */
 // https://github.com/Cyan4973/xxHash
 // https://www.shadertoy.com/view/Xt3cDn
-export const xxhash32_4d = `fn xxhash32_4d(p: vec4u) -> u32 {
+export const xxhash324d = `fn xxhash324d(p: vec4u) -> u32 {
     let p2 = 2246822519u; let p3 = 3266489917u;
     let p4 = 668265263u; let p5 = 374761393u;
     var h32 = p.w + p5 + p.x * p3;
@@ -312,25 +312,25 @@ export const xxhash32_4d = `fn xxhash32_4d(p: vec4u) -> u32 {
 
 /**
  * @wgsl
- * @name rand11_sin
+ * @name rand11Sin
  * @description Random float from 1D input using sine (platform dependent).
  * @param {f32} n Input float value.
  * @returns {f32} Random float between 0 and 1.
  */
 // On generating random numbers, with help of y= [(a+x)sin(bx)] mod 1", W.J.J. Rey, 22nd European Meeting of Statisticians 1998
-export const rand11_sin = `fn rand11(n: f32) -> f32 { 
+export const rand11Sin = `fn rand11(n: f32) -> f32 { 
     return fract(sin(n) * 43758.5453123); 
 }`;
 
 /**
  * @wgsl
- * @name rand22_sin
+ * @name rand22Sin
  * @description Random float from 2D input using sine (platform dependent).
  * @param {vec2<f32>} n Input 2D vector.
  * @returns {f32} Random float between 0 and 1.
  */
 // On generating random numbers, with help of y= [(a+x)sin(bx)] mod 1", W.J.J. Rey, 22nd European Meeting of Statisticians 1998
-export const rand22_sin = `fn rand22(n: vec2f) -> f32 { 
+export const rand22Sin = `fn rand22(n: vec2f) -> f32 { 
     return fract(sin(dot(n, vec2f(12.9898, 4.1414))) * 43758.5453); 
 }`;
 
@@ -340,10 +340,10 @@ export const rand22_sin = `fn rand22(n: vec2f) -> f32 {
  * @description Simple 1D value noise using random interpolation.
  * @param {f32} p Input 1D coordinate.
  * @returns {f32} Noise value between 0 and 1.
- * @requires rand11_sin
+ * @requires rand11Sin
  */
 // WTFPL License
-export const valueNoise1D = `//! requires rand11_sin
+export const valueNoise1D = `//! requires rand11Sin
 fn noise(p: f32) -> f32 {
     let fl = floor(p);
     return mix(rand11(fl), rand11(fl + 1.), fract(p));
@@ -355,10 +355,10 @@ fn noise(p: f32) -> f32 {
  * @description Simple 2D value noise using smooth interpolation.
  * @param {vec2<f32>} n Input 2D coordinate.
  * @returns {f32} Noise value between 0 and 1.
- * @requires rand22_sin smoothStepVec2
+ * @requires rand22Sin smoothStepVec2
  */
 // WTFPL License
-export const valueNoise2D = `//! requires rand22_sin smoothStepVec2
+export const valueNoise2D = `//! requires rand22Sin smoothStepVec2
 fn noise2(n: vec2f) -> f32 {
     let d = vec2f(0., 1.);
     let b = floor(n);

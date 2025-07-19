@@ -16,12 +16,12 @@ export * from './sdf-utils';
 import { elasticWave, smoothStep, smoothStepVec2, rotate2D, exponentialRamp, logisticCurve, stepSequence, taylorInvSqrt4 } from './math';
 import { 
   hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D,
-  pcg, pcg2d, pcg3d, pcg4d, xxhash32, xxhash32_2d, xxhash32_3d, xxhash32_4d,
-  rand11_sin, rand22_sin, valueNoise1D, valueNoise2D, mod289, perm4, valueNoise3D,
+  pcg, pcg2d, pcg3d, pcg4d, xxhash32, xxhash322d, xxhash323d, xxhash324d,
+  rand11Sin, rand22Sin, valueNoise1D, valueNoise2D, mod289, perm4, valueNoise3D,
   perlinNoise2D, perlinNoise3D, simplexNoise2D, simplexNoise3D, simplexNoise4D
 } from './noise';
-import { sdfCircle, sdfBox, sdfUnion, sdfIntersection, sdfSubtraction, boxFrameSDF, cappedTorusSDF, capsuleSDF, coneSDF, cylinderSDF, ellipsoidSDF, gyroidSDF, hexagonalPrismSDF, icosahedronSDF, juliaSDF, octahedronSDF, planeSDF, pyramidSDF, rhombusSDF, roundBoxSDF, roundedConeSDF, roundedCylinderSDF, sphereSDF, tetrahedronSDF, torusSDF, triangularPrismSDF } from './sdf';
-import { palette, linearToSrgb, srgbToLinear, hue2rgb, hslToRgb } from './color';
+import { sdfCircle, sdfBox, sdfUnion, sdfIntersection, sdfSubtraction, sdfBoxFrame, sdfCappedTorus, sdfCapsule, sdfCone, sdfCylinder, sdfEllipsoid, sdfGyroid, sdfHexagonalPrism, sdfIcosahedron, sdfJulia, sdfOctahedron, sdfPlane, sdfPyramid, sdfRhombus, sdfRoundBox, sdfRoundedCone, sdfRoundedCylinder, sdfSphere, sdfTetrahedron, sdfTorus, sdfTriangularPrism } from './sdf';
+import { palette, linearToSrgb, srgbToLinear, hueToRgb, hslToRgb } from './color';
 import { bezierCubic, easeIn, easeOut, easeInOut, elasticIn, elasticOut, backIn, backOut, springPhysics } from './animation';
 import { triangleWave, sawtoothWave, squareWave, pulseWave, chirpWave, noiseWave } from './waves';
 import { sdfOpUnion, sdfOpSubtract, sdfOpIntersect, sdfSmoothUnion, sdfSmoothSubtract, sdfSmoothIntersect, sdfChamferUnion, sdfChamferSubtract, sdfChamferIntersect } from './sdf-operations';
@@ -55,11 +55,11 @@ export const wgslFns = {
   pcg3d,
   pcg4d,
   xxhash32,
-  xxhash32_2d,
-  xxhash32_3d,
-  xxhash32_4d,
-  rand11_sin,
-  rand22_sin,
+  xxhash322d,
+  xxhash323d,
+  xxhash324d,
+  rand11Sin,
+  rand22Sin,
   valueNoise1D,
   valueNoise2D,
   mod289,
@@ -77,33 +77,33 @@ export const wgslFns = {
   sdfUnion,
   sdfIntersection,
   sdfSubtraction,
-  boxFrameSDF,
-  cappedTorusSDF,
-  capsuleSDF,
-  coneSDF,
-  cylinderSDF,
-  ellipsoidSDF,
-  gyroidSDF,
-  hexagonalPrismSDF,
-  icosahedronSDF,
-  juliaSDF,
-  octahedronSDF,
-  planeSDF,
-  pyramidSDF,
-  rhombusSDF,
-  roundBoxSDF,
-  roundedConeSDF,
-  roundedCylinderSDF,
-  sphereSDF,
-  tetrahedronSDF,
-  torusSDF,
-  triangularPrismSDF,
+  sdfBoxFrame,
+  sdfCappedTorus,
+  sdfCapsule,
+  sdfCone,
+  sdfCylinder,
+  sdfEllipsoid,
+  sdfGyroid,
+  sdfHexagonalPrism,
+  sdfIcosahedron,
+  sdfJulia,
+  sdfOctahedron,
+  sdfPlane,
+  sdfPyramid,
+  sdfRhombus,
+  sdfRoundBox,
+  sdfRoundedCone,
+  sdfRoundedCylinder,
+  sdfSphere,
+  sdfTetrahedron,
+  sdfTorus,
+  sdfTriangularPrism,
   
   // Color functions
   palette,
   linearToSrgb,
   srgbToLinear,
-  hue2rgb,
+  hueToRgb,
   hslToRgb,
   
   // Animation functions

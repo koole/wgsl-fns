@@ -74,7 +74,7 @@ describe('wgsl-fns main functionality', () => {
     // Test functions that have dependencies with specific expected dependencies
     const testCases = [
       { function: 'fbm', expectedDeps: ['hash22', 'noise2D'] },
-      { function: 'hslToRgb', expectedDeps: ['hue2rgb'] },
+      { function: 'hslToRgb', expectedDeps: ['hueToRgb'] },
       { function: 'noiseWave', expectedDeps: ['hash1D'] },
       { function: 'noise3D', expectedDeps: ['hash31'] },
       { function: 'warpNoise3D', expectedDeps: ['hash31', 'noise3D'] },
