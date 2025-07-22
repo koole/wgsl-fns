@@ -113,7 +113,6 @@ function parseFile(filePath) {
 function generateJson() {
   const documentation = {
     meta: {
-      generatedAt: new Date().toISOString(),
       totalFunctions: 0,
       totalCategories: Object.keys(categories).length
     },
