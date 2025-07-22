@@ -17,6 +17,7 @@
     "prebuild": "npm run docs",
     "prepublishOnly": "npm run build",
     "test": "node --test test/*.test.js",
+    "test:compile": "tsc --noEmit",
     "test:ci": "npm run build && npm test"
   },
   "keywords": [
