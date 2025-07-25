@@ -15,7 +15,7 @@ export * from './sdf-utils';
 // Import individual functions for registry
 import { elasticWave, smoothStep, smoothStepVec2, rotate2D, exponentialRamp, logisticCurve, stepSequence, taylorInvSqrt4 } from './math';
 import { 
-  hash22, noise2D, fbm, hash1D, hash31, hash3D, noise3D, warpNoise3D,
+  hash22, noise2D, fbm2D, fbm3D, hash1D, hash31, hash3D, noise3D, warpNoise3D,
   pcg, pcg2d, pcg3d, pcg4d, xxhash32, xxhash322d, xxhash323d, xxhash324d,
   rand11Sin, rand22Sin, valueNoise1D, valueNoise2D, mod289, perm4, valueNoise3D,
   perlinNoise2D, perlinNoise3D, simplexNoise2D, simplexNoise3D, simplexNoise4D
@@ -44,7 +44,8 @@ export const wgslFns = {
   // Noise functions
   noise2D,
   hash22,
-  fbm,
+  fbm2D,
+  fbm3D,
   hash1D,
   hash31,
   hash3D,

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "totalFunctions": 109,
+    "totalFunctions": 110,
     "totalCategories": 10
   },
   "categories": [
@@ -289,7 +289,7 @@
           "wgslCode": "//! requires hash22\nfn noise2D(p: vec2<f32>) -> f32 {\n  let i = floor(p);\n  let f = fract(p);\n  let u = f * f * (3.0 - 2.0 * f);\n  return mix(\n    mix(dot(hash22(i + vec2<f32>(0.0, 0.0)), f - vec2<f32>(0.0, 0.0)),\n        dot(hash22(i + vec2<f32>(1.0, 0.0)), f - vec2<f32>(1.0, 0.0)), u.x),\n    mix(dot(hash22(i + vec2<f32>(0.0, 1.0)), f - vec2<f32>(0.0, 1.0)),\n        dot(hash22(i + vec2<f32>(1.0, 1.0)), f - vec2<f32>(1.0, 1.0)), u.x), u.y);\n}"
         },
         {
-          "name": "fbm",
+          "name": "fbm2D",
           "description": "Brownian Motion - combines multiple octaves of noise for complex patterns.",
           "params": [
             {
@@ -310,7 +310,31 @@
           "dependencies": [
             "noise2D"
           ],
-          "wgslCode": "//! requires noise2D\nfn fbm(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
+          "wgslCode": "//! requires noise2D\nfn fbm2D(p: vec2<f32>, octaves: i32) -> f32 {\n  var value = 0.0;\n  var amplitude = 0.5;\n  var frequency = 1.0;\n  for (var i = 0; i < octaves; i++) {\n    value += amplitude * noise2D(p * frequency);\n    amplitude *= 0.5;\n    frequency *= 2.0;\n  }\n  return value;\n}"
+        },
+        {
+          "name": "fbm3D",
+          "description": "Brownian Motion - combines multiple octaves of noise for complex patterns.",
+          "params": [
+            {
+              "name": "p",
+              "type": "vec3<f32>",
+              "description": "Input 3D coordinate."
+            },
+            {
+              "name": "octaves",
+              "type": "i32",
+              "description": "Number of noise octaves to combine."
+            }
+          ],
+          "returns": {
+            "type": "f32",
+            "description": "noise value."
+          },
+          "dependencies": [
+            "noise3D"
+          ],
+          "wgslCode": "//! requires noise3D\n  fn fbm3D(x: vec3f, seed: f32) -> f32 {\n    var p = x + seed;\n    var f = 0.0;\n    var w = 0.5;\n    for (var i = 0; i < 5; i++) {\n      f += w * noise3D(p);\n      p *= 2.0;\n      w *= 0.5;\n    }\n    return f;\n  }\n"
         },
         {
           "name": "hash1D",

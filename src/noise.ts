@@ -35,15 +35,15 @@ fn noise2D(p: vec2<f32>) -> f32 {
 
 /**
  * @wgsl
- * @name fbm
+ * @name fbm2D
  * @description Fractional Brownian Motion - combines multiple octaves of noise for complex patterns.
  * @param {vec2<f32>} p Input 2D coordinate.
  * @param {i32} octaves Number of noise octaves to combine.
  * @returns {f32} Combined noise value.
  * @requires noise2D
  */
-export const fbm = `//! requires noise2D
-fn fbm(p: vec2<f32>, octaves: i32) -> f32 {
+export const fbm2D = `//! requires noise2D
+fn fbm2D(p: vec2<f32>, octaves: i32) -> f32 {
   var value = 0.0;
   var amplitude = 0.5;
   var frequency = 1.0;
@@ -54,6 +54,29 @@ fn fbm(p: vec2<f32>, octaves: i32) -> f32 {
   }
   return value;
 }`;
+
+/**
+ * @wgsl
+ * @name fbm3D
+ * @description Fractional Brownian Motion - combines multiple octaves of noise for complex patterns.
+ * @param {vec3<f32>} p Input 3D coordinate.
+ * @param {i32} octaves Number of noise octaves to combine.
+ * @returns {f32} Combined noise value.
+ * @requires noise3D
+ */
+export const fbm3D = `//! requires noise3D
+  fn fbm3D(x: vec3f, seed: f32) -> f32 {
+    var p = x + seed;
+    var f = 0.0;
+    var w = 0.5;
+    for (var i = 0; i < 5; i++) {
+      f += w * noise3D(p);
+      p *= 2.0;
+      w *= 0.5;
+    }
+    return f;
+  }
+`;
 
 /**
  * @wgsl

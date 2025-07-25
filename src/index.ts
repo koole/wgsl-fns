@@ -12,15 +12,20 @@ export function getFns(functionNames: WgslFunctionName[]): string {
   
   // Combine dependencies with requested functions, avoiding duplicates
   const allFunctionNames = [...dependencies, ...functionNames.filter(name => !dependencies.includes(name))];
-  
-  const functions = allFunctionNames.map(name => {
+
+  // Deduplicate function code blocks
+  const seen = new Set<string>();
+  const functions: string[] = [];
+  for (const name of allFunctionNames) {
     const fn = wgslFns[name];
     if (!fn) {
       throw new Error(`WGSL function "${name}" not found`);
     }
-    return fn;
-  });
-  
+    if (!seen.has(fn)) {
+      seen.add(fn);
+      functions.push(fn);
+    }
+  }
   return functions.join('\n\n');
 }
 

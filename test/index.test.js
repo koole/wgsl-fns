@@ -73,7 +73,7 @@ describe('wgsl-fns main functionality', () => {
   test('dependency resolution should work correctly', () => {
     // Test functions that have dependencies with specific expected dependencies
     const testCases = [
-      { function: 'fbm', expectedDeps: ['hash22', 'noise2D'] },
+      { function: 'fbm2D', expectedDeps: ['hash22', 'noise2D'] },
       { function: 'hslToRgb', expectedDeps: ['hueToRgb'] },
       { function: 'noiseWave', expectedDeps: ['hash1D'] },
       { function: 'noise3D', expectedDeps: ['hash31'] },
